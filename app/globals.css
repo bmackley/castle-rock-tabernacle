@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  /* Linen / cream — soft warm neutrals layered over a white base.
+     Values verified for WCAG: dark text on these reads at AAA. */
+  --color-linen-50: #f8f6f1;
+  --color-linen-100: #f3eee2;
+  --color-linen-200: #e7e0cf;
+  --color-linen-300: #d8cbac;
+
+  /* Gold — the overlaid acacia wood and sacred vessels */
+  --color-gold-300: #d9c089;
+  --color-gold-400: #c9a861;
+  --color-gold-500: #b8923f;
+  --color-gold-600: #9a7b3f;
+  --color-gold-700: #7d6330;
+
+  /* Royal blue / indigo — the curtains and the veil */
+  --color-royal-600: #34457e;
+  --color-royal-700: #2d3a6b;
+  --color-royal-800: #1e2a52;
+  --color-royal-900: #161f3e;
+
+  /* Purple & scarlet — the woven threads of the veil */
+  --color-purple-600: #5b3f7a;
+  --color-scarlet-600: #9b2d30;
+
+  --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-fade-up: fade-up 0.6s ease-out both;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    /* White base for crisp, high-contrast reading (WCAG-first). */
+    @apply bg-white text-royal-900 antialiased;
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  /* Thin gold rule used as a section divider */
+  .gold-rule {
+    @apply inline-block h-px w-16 bg-gold-500;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
