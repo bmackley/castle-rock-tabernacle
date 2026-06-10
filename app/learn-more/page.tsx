@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { BookOpen, PlayCircle, Ticket } from "lucide-react";
+import { BookOpen, FileText, Ticket, ExternalLink } from "lucide-react";
 import SectionHeading from "@/components/SectionHeading";
+import VideoCard from "@/components/VideoCard";
 import { LinkButton } from "@/components/ui/Button";
-import { learningGuides, videoSeries } from "@/lib/content";
+import { learningGuides, videoSeries, videoSections } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Learn More",
@@ -17,11 +18,14 @@ export default function LearnMorePage() {
       <section className="border-b border-linen-200 bg-linen-50 py-16 text-center sm:py-20">
         <div className="mx-auto max-w-3xl px-5">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-gold-700">Learn More</p>
-          <h1 className="mt-4 text-4xl font-semibold text-royal-900 sm:text-5xl">Christ in the Ancient Tabernacle</h1>
+          <h1 className="mt-4 text-4xl font-semibold text-royal-900 sm:text-5xl">
+            Finding Christ in the Ancient Tabernacle
+          </h1>
           <span className="gold-rule mt-5" />
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-slate-600">
-            The Tabernacle's design, furnishings, and ordinances were given as symbols. Each one teaches
-            us about the Savior. These free guides help you see Him before you ever step inside.
+            Seven free learning guides teach about the Tabernacle and its vessels, the High Priest,
+            the sacrificial ordinances, and their symbolism of Jesus Christ and His mission — with
+            videos from the <em>Messages of Christ</em> series to bring further insight and depth.
           </p>
         </div>
       </section>
@@ -31,13 +35,16 @@ export default function LearnMorePage() {
         <SectionHeading
           eyebrow="Learning Guides"
           title="Seven guides to walk you through"
-          subtitle="Read these on your own or with your family. Each one draws out the meaning of a part of the Tabernacle and how it points to Jesus Christ."
+          subtitle="Read these on your own or with your family. Each guide is a free PDF that draws out the meaning of a part of the Tabernacle and how it points to Jesus Christ."
         />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {learningGuides.map((g, i) => (
-            <article
-              key={g.slug}
-              className="flex flex-col rounded-2xl border border-linen-200 bg-linen-50 p-6 transition-shadow hover:shadow-md"
+            <a
+              key={g.title}
+              href={g.pdfUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="group flex flex-col rounded-2xl border border-linen-200 bg-linen-50 p-6 transition-shadow hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-500"
             >
               <div className="flex items-center gap-3">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-500/15 text-sm font-semibold text-gold-700">
@@ -45,9 +52,15 @@ export default function LearnMorePage() {
                 </span>
                 <BookOpen className="text-gold-700" size={20} />
               </div>
-              <h3 className="mt-4 text-xl font-semibold text-royal-900">{g.title}</h3>
+              <h3 className="mt-4 text-xl font-semibold text-royal-900 group-hover:text-gold-700">
+                {g.title}
+              </h3>
               <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{g.summary}</p>
-            </article>
+              <span className="mt-4 flex items-center gap-2 text-sm font-semibold text-gold-700">
+                <FileText size={16} /> Read the guide (PDF)
+                <ExternalLink size={13} className="opacity-60" />
+              </span>
+            </a>
           ))}
         </div>
       </section>
@@ -88,26 +101,26 @@ export default function LearnMorePage() {
         <div className="mx-auto max-w-6xl px-5">
           <SectionHeading
             eyebrow="Video Series"
-            title={videoSeries.title}
+            title={`${videoSeries.title} by ${videoSeries.narrator}`}
             subtitle={videoSeries.intro}
           />
-          <p className="mt-2 text-sm text-slate-600">Narrated by {videoSeries.narrator}</p>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {videoSeries.episodes.map((ep) => (
-              <article key={ep.title} className="overflow-hidden rounded-2xl border border-linen-200 bg-linen-50">
-                <div className="flex aspect-video items-center justify-center bg-royal-800">
-                  <PlayCircle className="text-gold-400" size={44} />
+
+          <div className="mt-4 space-y-16">
+            {videoSections.map((section) => (
+              <div key={section.title}>
+                <div className="mt-12 flex items-baseline gap-4">
+                  <h3 className="font-display text-2xl font-semibold text-royal-900">{section.title}</h3>
+                  <span className="hidden h-px flex-1 bg-linen-300 sm:block" />
                 </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-semibold text-royal-900">{ep.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{ep.description}</p>
+                <p className="mt-2 max-w-2xl text-sm text-slate-600">{section.intro}</p>
+                <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {section.videos.map((v) => (
+                    <VideoCard key={v.youtubeId} video={v} />
+                  ))}
                 </div>
-              </article>
+              </div>
             ))}
           </div>
-          <p className="mt-6 text-xs text-slate-500">
-            Video links can be added in <code className="rounded bg-linen-200 px-1.5 py-0.5">lib/content.ts</code> once hosting is chosen.
-          </p>
         </div>
       </section>
 

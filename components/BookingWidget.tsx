@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, Clock, Users, CheckCircle2, Ticket, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import AddToCalendar from "@/components/AddToCalendar";
 import { formatDateLong, formatDateShort, formatTimeRange, weekdayName } from "@/lib/booking";
 import type { AvailableSlot } from "@/lib/types";
 
@@ -120,9 +121,20 @@ export default function BookingWidget({ initialSlots }: { initialSlots: Availabl
           </div>
         </div>
 
+        <div className="mt-6">
+          <AddToCalendar
+            event={{
+              slotDate: success.slotDate,
+              startTime: success.startTime,
+              endTime: success.endTime,
+              code: success.code,
+            }}
+          />
+        </div>
+
         <p className="mt-5 text-sm text-slate-600">
           Keep your confirmation code. You can{" "}
-          <a href={`/reservation/${success.code}`} className="font-medium text-gold-700 hover:text-gold-700">
+          <a href={`/reservation/${success.code}`} className="font-medium text-gold-700 hover:text-gold-600">
             manage your reservation here
           </a>
           .

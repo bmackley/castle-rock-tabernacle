@@ -122,7 +122,7 @@ export default function HomePage() {
           />
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {learningGuides.slice(0, 3).map((g) => (
-              <div key={g.slug} className="rounded-2xl border border-linen-200 bg-linen-50 p-6">
+              <div key={g.title} className="rounded-2xl border border-linen-200 bg-linen-50 p-6">
                 <BookOpen className="text-gold-700" size={22} />
                 <h3 className="mt-4 text-xl font-semibold text-royal-900">{g.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">{g.summary}</p>

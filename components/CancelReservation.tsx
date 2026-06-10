@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Ticket, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
@@ -8,6 +9,7 @@ const inputClass =
   "w-full rounded-lg border border-linen-300 bg-linen-50 px-4 py-3 text-sm text-royal-900 outline-none transition-colors placeholder:text-slate-400 focus:border-gold-500";
 
 export default function CancelReservation({ code }: { code: string }) {
+  const router = useRouter();
   const [status, setStatus] = useState<"idle" | "working" | "cancelled" | "error">("idle");
   const [error, setError] = useState("");
 
@@ -26,6 +28,8 @@ export default function CancelReservation({ code }: { code: string }) {
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? "Something went wrong.");
       setStatus("cancelled");
+      router.refresh(); // re-render the server details so the status badge updates
+
     } catch (err) {
       setStatus("error");
       setError(err instanceof Error ? err.message : "Something went wrong.");

@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { site, fullAddress } from "@/lib/site";
 import { formatDateLong, formatTimeRange } from "@/lib/booking";
+import { googleCalendarUrl, outlookCalendarUrl, buildIcs } from "@/lib/calendar";
 
 export const resend = new Resend(process.env.RESEND_API_KEY!);
 
@@ -57,6 +58,19 @@ export async function sendReservationConfirmation(data: ReservationEmailData) {
     <p style="font-size:14px;color:#666;line-height:1.6;margin:0 0 8px;">
       Admission is free. Please arrive 10 minutes early. The tour lasts about 45 minutes and includes some walking and standing.
     </p>
+    <p style="margin:20px 0 0;text-align:center;">
+      <a href="${googleCalendarUrl({ slotDate: data.slotDate, startTime: data.startTime, endTime: data.endTime, code: data.code })}"
+         style="display:inline-block;background:#b8923f;color:#161f3e;font-weight:600;font-size:14px;padding:10px 22px;border-radius:999px;text-decoration:none;margin:0 4px 8px;">
+        Add to Google Calendar
+      </a>
+      <a href="${outlookCalendarUrl({ slotDate: data.slotDate, startTime: data.startTime, endTime: data.endTime, code: data.code })}"
+         style="display:inline-block;background:#1e2a52;color:#f8f6f1;font-weight:600;font-size:14px;padding:10px 22px;border-radius:999px;text-decoration:none;margin:0 4px 8px;">
+        Add to Outlook
+      </a>
+    </p>
+    <p style="font-size:12px;color:#999;text-align:center;margin:8px 0 0;">
+      Using Apple Calendar? Open the attached invite.
+    </p>
     <p style="font-size:13px;color:#999;line-height:1.6;margin:16px 0 0;">
       Need to cancel or change your party size?
       <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">Manage your reservation →</a>
@@ -67,6 +81,15 @@ export async function sendReservationConfirmation(data: ReservationEmailData) {
     to: data.to,
     subject: `Reserved: Tabernacle tour on ${when}`,
     html: shell(inner),
+    attachments: [
+      {
+        filename: "tabernacle-tour.ics",
+        content: Buffer.from(
+          buildIcs({ slotDate: data.slotDate, startTime: data.startTime, endTime: data.endTime, code: data.code })
+        ),
+        contentType: "text/calendar",
+      },
+    ],
   });
   if (error) throw new Error(error.message);
 }
