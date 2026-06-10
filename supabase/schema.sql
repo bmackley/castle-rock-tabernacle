@@ -181,6 +181,26 @@ begin
 end;
 $$;
 
+-- ── events ────────────────────────────────────────────────────────────
+-- Informational/RSVP events (e.g. devotionals) that are not bookable tour slots.
+create table if not exists public.events (
+  id          uuid primary key default gen_random_uuid(),
+  title       text        not null,
+  event_date  date        not null,
+  start_time  time        not null,
+  end_time    time,
+  location    text,
+  description text,
+  rsvp_url    text,
+  status      text        not null default 'active' check (status in ('active', 'cancelled')),
+  created_at  timestamptz not null default now(),
+  unique (title, event_date, start_time)
+);
+
+create index if not exists events_date_idx on public.events (event_date);
+
+grant select on public.events to anon, authenticated;
+
 -- ── Row Level Security ────────────────────────────────────────────────
 -- Enable RLS with NO anon/authenticated policies: direct table access is
 -- denied. All public access flows through the view + SECURITY DEFINER RPCs.
