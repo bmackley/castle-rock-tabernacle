@@ -36,6 +36,19 @@ export interface Reservation {
   created_at: string;
 }
 
+// Informational/RSVP events (e.g. devotionals) from the public events table.
+export interface CommunityEvent {
+  id: string;
+  title: string;
+  event_date: string; // YYYY-MM-DD
+  start_time: string; // HH:MM:SS — 00:00:00 means "time to be announced"
+  end_time: string | null;
+  location: string | null;
+  description: string | null;
+  rsvp_url: string | null;
+  status: "active" | "cancelled";
+}
+
 // Return shape of the book_slot RPC.
 export interface BookingResult {
   confirmation_code: string;

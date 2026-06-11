@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { site, fullAddress } from "@/lib/site";
-import { formatDateLong, formatTimeRange } from "@/lib/booking";
+import { formatDateLong, formatTime, formatTimeRange } from "@/lib/booking";
 import { googleCalendarUrl, outlookCalendarUrl, buildIcs } from "@/lib/calendar";
 
 export const resend = new Resend(process.env.RESEND_API_KEY!);
@@ -137,6 +137,37 @@ export async function sendTourReminder(data: ReservationEmailData) {
     </p>`;
   await resend.emails
     .send({ from: SENDER, to: data.to, subject: `Reminder: your Tabernacle tour is tomorrow`, html: shell(inner) })
+    .catch(() => {});
+}
+
+// → Visitor: the morning of their tour
+export async function sendTourMorningReminder(data: ReservationEmailData) {
+  const time = formatTimeRange(data.startTime, data.endTime);
+  const inner = `
+    <h1 style="font-size:22px;margin:16px 0 8px;">Your tour is today 🌅</h1>
+    <p style="font-size:15px;color:#444;line-height:1.6;margin:0 0 16px;">
+      Good morning, ${data.name.split(" ")[0]}! We're looking forward to welcoming you at the Tabernacle today.
+    </p>
+    <table style="width:100%;border-collapse:collapse;font-size:15px;background:#faf7f0;border-radius:10px;overflow:hidden;">
+      <tr><td style="padding:14px 18px;color:#8a7a55;">Time</td><td style="padding:14px 18px;font-weight:600;text-align:right;">${time}</td></tr>
+      <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Guests</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${data.partySize}</td></tr>
+      <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Where</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${fullAddress()}</td></tr>
+    </table>
+    <p style="font-size:14px;color:#666;line-height:1.6;margin:16px 0 0;">
+      Please arrive 10 minutes early so your group can begin together. Free parking is available on site.
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress())}" style="color:#9a7b3f;">Get directions →</a>
+    </p>
+    <p style="font-size:13px;color:#999;line-height:1.6;margin:16px 0 0;">
+      Confirmation ${data.code}.
+      <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">Can't make it? Cancel here →</a>
+    </p>`;
+  await resend.emails
+    .send({
+      from: SENDER,
+      to: data.to,
+      subject: `Today: your Tabernacle tour at ${formatTime(data.startTime)}`,
+      html: shell(inner),
+    })
     .catch(() => {});
 }
 

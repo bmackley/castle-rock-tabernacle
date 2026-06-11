@@ -41,6 +41,10 @@ async function getInitialSlots(): Promise<AvailableSlot[]> {
 
 const faqs = [
   {
+    q: "Do I need a reservation?",
+    a: "A reservation is the best way to ensure your preferred day and time. Walk-in guests are warmly welcome and will be accommodated as space allows; however, guests with reservations receive priority admission at their scheduled time. We kindly encourage reserving in advance.",
+  },
+  {
     q: "How much does the tour cost?",
     a: "Nothing — admission and the guided tour are completely free. Reservations simply help us keep groups a comfortable size.",
   },
@@ -95,6 +99,11 @@ export default async function PlanYourVisitPage() {
               <Ticket size={18} /> See available times
             </LinkButton>
           </div>
+
+          <p className="mx-auto mt-6 max-w-xl text-sm text-slate-500">
+            Walk-in guests are warmly welcome as space allows; guests with reservations are
+            admitted first at their scheduled time.
+          </p>
         </div>
       </section>
 

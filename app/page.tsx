@@ -3,7 +3,11 @@ import { CalendarDays, MapPin, Clock, Ticket, BookOpen, Footprints } from "lucid
 import { site, fullAddress } from "@/lib/site";
 import { LinkButton } from "@/components/ui/Button";
 import SectionHeading from "@/components/SectionHeading";
+import UpcomingEvents from "@/components/UpcomingEvents";
 import { learningGuides } from "@/lib/content";
+
+// Refresh periodically so upcoming events appear/expire without a redeploy.
+export const revalidate = 300;
 
 export default function HomePage() {
   return (
@@ -43,6 +47,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── Special events (kick-off devotional etc.) ─────────── */}
+      <UpcomingEvents />
 
       {/* ── Quick facts ───────────────────────────────────────── */}
       <section className="border-b border-linen-200 bg-linen-100">

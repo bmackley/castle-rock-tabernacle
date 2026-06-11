@@ -14,49 +14,49 @@ export const learningGuides: LearningGuide[] = [
     summary:
       "The Lord teaches His children through symbols — simple, powerful likenesses found in the scriptures, ordinances, and the world around us. As we study with faith, symbols help eternal principles become personal, memorable, and transformative, bearing record of Christ in both temporal and spiritual ways.",
     pdfUrl:
-      "https://1bb21678-ff30-40c8-8f94-61b70172d45f.filesusr.com/ugd/645230_00bf456a9c414f1094a85620065fcf4c.pdf",
+      "/guides/1-the-lords-way-of-teaching.pdf",
   },
   {
     title: "Holy Places",
     summary:
       "From the Garden of Eden to modern temples, the Lord has taught His children through sacred spaces set apart for His presence. Mountains, tabernacles, and temples all follow the same pattern: ascending step by step toward holiness, guided by covenants, mediation, and divine ordinances.",
     pdfUrl:
-      "https://1bb21678-ff30-40c8-8f94-61b70172d45f.filesusr.com/ugd/645230_6b304c1605a54b0ba36da785abfd214b.pdf",
+      "/guides/2-holy-places.pdf",
   },
   {
     title: "The Promise",
     summary:
       "God promised Israel that through His covenant they could become a holy nation and a kingdom of priests. Beginning with Abraham, priesthood authority was given to bless all nations, with symbols and ordinances pointing forward to Jesus Christ, the true High Priest, who would fully open the way back to God.",
     pdfUrl:
-      "https://www.castlerocktabernacle.com/_files/ugd/645230_e7b61379d4774ddb85f50452ce1d23f2.pdf",
+      "/guides/3-the-promise.pdf",
   },
   {
     title: "Organize Thyself",
     summary:
       "To receive the Lord in His sanctuary, Israel was organized around and focused on the Tabernacle. It mirrored His heavenly abode among them, and it was a shadow of the latter-day gathering of Israel around and in His holy house — teaching all who covenant with God who they are and to whom they belong.",
     pdfUrl:
-      "https://www.castlerocktabernacle.com/_files/ugd/645230_b86244c65e644c8d97f98b5af0ba5ca7.pdf",
+      "/guides/4-organize-thyself.pdf",
   },
   {
     title: "The Lord's Sanctuary",
     summary:
       "The Tabernacle reveals a progression of holiness — transcending this world toward heavenly space through the Atonement. Each part is a shadow or type of the Savior's mission and atoning sacrifice, a reminder of God's covenants with Israel and His desire to have us return to Him.",
     pdfUrl:
-      "https://www.castlerocktabernacle.com/_files/ugd/645230_32e2a4676a6b4fb98350a7f613ff610d.pdf",
+      "/guides/5-the-lords-sanctuary.pdf",
   },
   {
     title: "Atonement",
     summary:
       "The sacrificial ordinances provided atonement for the individual, the priest, and all of Israel — the Lord's way of teaching the process of repentance and the price of forgiveness. They foreshadowed the great and final sacrifice that would be made for all mankind by the Son of God.",
     pdfUrl:
-      "https://www.castlerocktabernacle.com/_files/ugd/645230_c25c0f4d164d44169a7e1f4e6e2c17ff.pdf",
+      "/guides/6-atonement.pdf",
   },
   {
     title: "Salvation",
     summary:
       "The shadows and types of the Tabernacle prepare all to become holy and enter the Lord's presence — possible only through the sacrifice of the Son of God foreshadowed in its ordinances. The Tabernacle reveals the power of covenants and the saving grace of the Lord's Plan of Salvation: the Way back to Him.",
     pdfUrl:
-      "https://www.castlerocktabernacle.com/_files/ugd/645230_ebfc746b17194a9cb8d3dc9523e4615f.pdf",
+      "/guides/7-salvation.pdf",
   },
 ];
 
