@@ -13,7 +13,7 @@ export const site = {
   },
   // Public-facing tour window shown in banners.
   season: "June 21–28, 2026",
-  email: "info@castlerocktabernacle.com",
+  email: "castlerocktabernacle@gmail.com",
   mapUrl:
     "https://www.google.com/maps/search/?api=1&query=950+S+Plum+Creek+Blvd+Castle+Rock+CO+80104",
 } as const;
