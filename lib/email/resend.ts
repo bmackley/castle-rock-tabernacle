@@ -8,6 +8,9 @@ export const resend = new Resend(process.env.RESEND_API_KEY!);
 const FROM = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
 const SENDER = `${site.name} <${FROM}>`;
 const ADMIN_TO = process.env.ADMIN_NOTIFY_EMAIL ?? "";
+// Guest replies go to a real, monitored inbox — the from-address domain is
+// send-only (no MX), so without this, replies would bounce.
+const REPLY_TO = process.env.RESEND_REPLY_TO ?? (ADMIN_TO || undefined);
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -79,6 +82,7 @@ export async function sendReservationConfirmation(data: ReservationEmailData) {
   const { error } = await resend.emails.send({
     from: SENDER,
     to: data.to,
+    replyTo: REPLY_TO,
     subject: `Reserved: Tabernacle tour on ${when}`,
     html: shell(inner),
     attachments: [
@@ -136,7 +140,7 @@ export async function sendTourReminder(data: ReservationEmailData) {
       <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">Can't make it? Cancel here →</a>
     </p>`;
   await resend.emails
-    .send({ from: SENDER, to: data.to, subject: `Reminder: your Tabernacle tour is tomorrow`, html: shell(inner) })
+    .send({ from: SENDER, to: data.to, replyTo: REPLY_TO, subject: `Reminder: your Tabernacle tour is tomorrow`, html: shell(inner) })
     .catch(() => {});
 }
 
@@ -165,6 +169,7 @@ export async function sendTourMorningReminder(data: ReservationEmailData) {
     .send({
       from: SENDER,
       to: data.to,
+      replyTo: REPLY_TO,
       subject: `Today: your Tabernacle tour at ${formatTime(data.startTime)}`,
       html: shell(inner),
     })
