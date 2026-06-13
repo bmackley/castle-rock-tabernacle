@@ -5,7 +5,7 @@ import CancelReservation from "@/components/CancelReservation";
 import AddToCalendar from "@/components/AddToCalendar";
 import { LinkButton } from "@/components/ui/Button";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { formatDateLong, formatTimeRange } from "@/lib/booking";
+import { formatDateLong, formatTime } from "@/lib/booking";
 import { site, fullAddress } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -131,8 +131,8 @@ export default async function ReservationPage({
                 <div>
                   <dt className="text-slate-500">Time</dt>
                   <dd className="font-semibold text-royal-900">
-                    {formatTimeRange(slot.start_time, slot.end_time)}
-                    <span className="ml-2 font-normal text-slate-500">· please arrive 10 minutes early</span>
+                    {formatTime(slot.start_time)}
+                    <span className="ml-2 font-normal text-slate-500">· about 45 min · please arrive 10 min early</span>
                   </dd>
                 </div>
               </div>

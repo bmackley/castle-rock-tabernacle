@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, Clock, Users, CheckCircle2, Ticket, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import AddToCalendar from "@/components/AddToCalendar";
-import { formatDateLong, formatDateShort, formatTime, formatTimeRange, weekdayName } from "@/lib/booking";
+import { formatDateLong, formatDateShort, formatTime, weekdayName } from "@/lib/booking";
 import type { AvailableSlot } from "@/lib/types";
 
 const inputClass =
@@ -128,7 +128,7 @@ export default function BookingWidget({ initialSlots }: { initialSlots: Availabl
 
         <div className="mx-auto mt-6 max-w-sm space-y-3 rounded-2xl bg-royal-900 p-6 text-left text-linen-50">
           <Row label="Date" value={formatDateLong(success.slotDate)} />
-          <Row label="Time" value={formatTimeRange(success.startTime, success.endTime)} />
+          <Row label="Time" value={`${formatTime(success.startTime)} · about 45 min`} />
           <Row label="Guests" value={String(success.partySize)} />
           <div className="border-t border-royal-700 pt-3">
             <Row label="Confirmation" value={success.code} strong />
@@ -245,7 +245,7 @@ export default function BookingWidget({ initialSlots }: { initialSlots: Availabl
                 </option>
                 {slotsForDate.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {formatTimeRange(s.start_time, s.end_time)} · {s.remaining} {s.remaining === 1 ? "spot" : "spots"} left
+                    {formatTime(s.start_time)} · {s.remaining} {s.remaining === 1 ? "spot" : "spots"} left
                   </option>
                 ))}
               </select>

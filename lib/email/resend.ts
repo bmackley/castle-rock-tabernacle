@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { site, fullAddress } from "@/lib/site";
-import { formatDateLong, formatTime, formatTimeRange } from "@/lib/booking";
+import { formatDateLong, formatTime } from "@/lib/booking";
 import { googleCalendarUrl, outlookCalendarUrl, buildIcs } from "@/lib/calendar";
 
 export const resend = new Resend(process.env.RESEND_API_KEY!);
@@ -42,7 +42,7 @@ interface ReservationEmailData {
 // → Visitor: "your spot is reserved"
 export async function sendReservationConfirmation(data: ReservationEmailData) {
   const when = formatDateLong(data.slotDate);
-  const time = formatTimeRange(data.startTime, data.endTime);
+  const time = formatTime(data.startTime);
 
   const inner = `
     <h1 style="font-size:22px;margin:16px 0 8px;">You're reserved, ${data.name.split(" ")[0]} 🎟️</h1>
@@ -52,6 +52,7 @@ export async function sendReservationConfirmation(data: ReservationEmailData) {
     <table style="width:100%;border-collapse:collapse;font-size:15px;background:#faf7f0;border-radius:10px;overflow:hidden;">
       <tr><td style="padding:14px 18px;color:#8a7a55;">Date</td><td style="padding:14px 18px;font-weight:600;text-align:right;">${when}</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Time</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${time}</td></tr>
+      <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Duration</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">About 45 minutes</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Guests</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${data.partySize}</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Confirmation</td><td style="padding:14px 18px;font-weight:700;text-align:right;border-top:1px solid #efe7d6;letter-spacing:0.05em;">${data.code}</td></tr>
     </table>
@@ -59,7 +60,7 @@ export async function sendReservationConfirmation(data: ReservationEmailData) {
       <strong>Where:</strong> ${fullAddress()}
     </p>
     <p style="font-size:14px;color:#666;line-height:1.6;margin:0 0 8px;">
-      Admission is free. Please arrive 10 minutes early. The tour lasts about 45 minutes and includes some walking and standing.
+      Admission is free. Please arrive 10 minutes early. The tour includes some walking and standing.
     </p>
     <p style="margin:20px 0 0;text-align:center;">
       <a href="${googleCalendarUrl({ slotDate: data.slotDate, startTime: data.startTime, endTime: data.endTime, code: data.code })}"
@@ -104,7 +105,7 @@ export async function sendReservationRescheduled(
   data: ReservationEmailData & { from: { date: string; startTime: string } }
 ) {
   const when = formatDateLong(data.slotDate);
-  const time = formatTimeRange(data.startTime, data.endTime);
+  const time = formatTime(data.startTime);
   const oldWhen = `${formatDateLong(data.from.date)} at ${formatTime(data.from.startTime)}`;
 
   const inner = `
@@ -116,6 +117,7 @@ export async function sendReservationRescheduled(
     <table style="width:100%;border-collapse:collapse;font-size:15px;background:#faf7f0;border-radius:10px;overflow:hidden;">
       <tr><td style="padding:14px 18px;color:#8a7a55;">Date</td><td style="padding:14px 18px;font-weight:600;text-align:right;">${when}</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Time</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${time}</td></tr>
+      <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Duration</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">About 45 minutes</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Guests</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${data.partySize}</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Confirmation</td><td style="padding:14px 18px;font-weight:700;text-align:right;border-top:1px solid #efe7d6;letter-spacing:0.05em;">${data.code}</td></tr>
     </table>
@@ -162,7 +164,7 @@ export async function sendAdminNewReservation(
 ) {
   if (!ADMIN_TO) return;
   const when = formatDateLong(data.slotDate);
-  const time = formatTimeRange(data.startTime, data.endTime);
+  const time = formatTime(data.startTime);
 
   const inner = `
     <h1 style="font-size:20px;margin:16px 0 16px;">${data.rescheduled ? "Reservation rescheduled" : "New tour reservation"}</h1>
@@ -184,7 +186,7 @@ export async function sendAdminNewReservation(
 // → Visitor: reminder the day before
 export async function sendTourReminder(data: ReservationEmailData) {
   const when = formatDateLong(data.slotDate);
-  const time = formatTimeRange(data.startTime, data.endTime);
+  const time = formatTime(data.startTime);
   const inner = `
     <h1 style="font-size:22px;margin:16px 0 8px;">See you tomorrow 👋</h1>
     <p style="font-size:15px;color:#444;line-height:1.6;margin:0 0 16px;">
@@ -192,6 +194,7 @@ export async function sendTourReminder(data: ReservationEmailData) {
     </p>
     <table style="width:100%;border-collapse:collapse;font-size:15px;background:#faf7f0;border-radius:10px;overflow:hidden;">
       <tr><td style="padding:14px 18px;color:#8a7a55;">When</td><td style="padding:14px 18px;font-weight:600;text-align:right;">${when}<br/>${time}</td></tr>
+      <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Duration</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">About 45 minutes</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Guests</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${data.partySize}</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Where</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${fullAddress()}</td></tr>
     </table>
@@ -206,7 +209,7 @@ export async function sendTourReminder(data: ReservationEmailData) {
 
 // → Visitor: the morning of their tour
 export async function sendTourMorningReminder(data: ReservationEmailData) {
-  const time = formatTimeRange(data.startTime, data.endTime);
+  const time = formatTime(data.startTime);
   const inner = `
     <h1 style="font-size:22px;margin:16px 0 8px;">Your tour is today 🌅</h1>
     <p style="font-size:15px;color:#444;line-height:1.6;margin:0 0 16px;">
@@ -214,6 +217,7 @@ export async function sendTourMorningReminder(data: ReservationEmailData) {
     </p>
     <table style="width:100%;border-collapse:collapse;font-size:15px;background:#faf7f0;border-radius:10px;overflow:hidden;">
       <tr><td style="padding:14px 18px;color:#8a7a55;">Time</td><td style="padding:14px 18px;font-weight:600;text-align:right;">${time}</td></tr>
+      <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Duration</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">About 45 minutes</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Guests</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${data.partySize}</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Where</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${fullAddress()}</td></tr>
     </table>
