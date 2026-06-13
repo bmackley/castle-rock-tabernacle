@@ -27,7 +27,7 @@ export default function HomePage() {
 
         <div className="mx-auto flex w-full max-w-6xl flex-col justify-between gap-10 px-5 py-10 sm:py-14">
           {/* Headline panel — top-left */}
-          <div className="animate-fade-up max-w-xl rounded-2xl bg-royal-900/80 px-7 py-7 backdrop-blur-sm sm:px-9 sm:py-8">
+          <div className="animate-fade-up max-w-xl rounded-2xl bg-royal-900/55 px-7 py-7 backdrop-blur-sm sm:px-9 sm:py-8">
             <h1 className="font-display text-4xl font-semibold leading-[1.08] text-white sm:text-5xl md:text-6xl">
               Come and Discover Christ in the Ancient Tabernacle
             </h1>
