@@ -34,6 +34,9 @@ export default function HomePage() {
             <p className="mt-4 flex items-center gap-2 text-sm font-medium text-gold-300">
               <CalendarDays size={16} /> Free guided tours · {site.season}
             </p>
+            <p className="mt-2 text-sm text-linen-200/80">
+              Walk-ins welcome. Reservations receive priority admission.
+            </p>
           </div>
 
           {/* Actions — bottom-right */}
