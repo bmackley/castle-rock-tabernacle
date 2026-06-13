@@ -178,9 +178,19 @@ export default async function ReservationPage({
           </div>
 
           <div className="mt-10">
-            <h2 className="text-lg font-semibold text-royal-900">Can&apos;t make it?</h2>
+            <h2 className="text-lg font-semibold text-royal-900">Need a different time?</h2>
             <p className="mt-1 text-sm text-slate-600">
-              Cancelling frees your spots for other visitors. You can always reserve a new time after.
+              Simply{" "}
+              <Link href="/plan-your-visit#reserve" className="font-medium text-gold-700 hover:text-gold-600">
+                book a new time
+              </Link>{" "}
+              with the same email address — we&apos;ll automatically cancel this reservation and
+              email you the new details.
+            </p>
+
+            <h2 className="mt-8 text-lg font-semibold text-royal-900">Can&apos;t make it at all?</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Cancelling frees your spots for other visitors.
             </p>
             <div className="mt-4">
               <CancelReservation code={cleanCode} />

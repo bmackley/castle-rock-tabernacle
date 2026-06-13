@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { sendReservationConfirmation, sendAdminNewReservation } from "@/lib/email/resend";
+import {
+  sendReservationConfirmation,
+  sendReservationRescheduled,
+  sendAdminNewReservation,
+} from "@/lib/email/resend";
 import type { BookingResult } from "@/lib/types";
 
 export async function POST(request: NextRequest) {
@@ -51,9 +55,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "We couldn't complete your reservation." }, { status: 500 });
   }
 
+  const rescheduledFrom =
+    result.rescheduled_from_date && result.rescheduled_from_start
+      ? { date: result.rescheduled_from_date, startTime: result.rescheduled_from_start }
+      : null;
+
   // Emails are best-effort: a failed send must not undo a confirmed booking.
   try {
-    await sendReservationConfirmation({
+    const emailData = {
       to: email,
       name,
       code: result.confirmation_code,
@@ -61,16 +70,16 @@ export async function POST(request: NextRequest) {
       startTime: result.start_time,
       endTime: result.end_time,
       partySize,
-    });
+    };
+    if (rescheduledFrom) {
+      await sendReservationRescheduled({ ...emailData, from: rescheduledFrom });
+    } else {
+      await sendReservationConfirmation(emailData);
+    }
     await sendAdminNewReservation({
-      to: email,
-      name,
+      ...emailData,
       phone: phone || null,
-      code: result.confirmation_code,
-      slotDate: result.slot_date,
-      startTime: result.start_time,
-      endTime: result.end_time,
-      partySize,
+      rescheduled: Boolean(rescheduledFrom),
     });
   } catch (err) {
     console.error("reserve email", err);
@@ -81,5 +90,6 @@ export async function POST(request: NextRequest) {
     slotDate: result.slot_date,
     startTime: result.start_time,
     endTime: result.end_time,
+    rescheduledFrom,
   });
 }

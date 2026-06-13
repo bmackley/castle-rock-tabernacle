@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, Clock, Users, CheckCircle2, Ticket, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import AddToCalendar from "@/components/AddToCalendar";
-import { formatDateLong, formatDateShort, formatTimeRange, weekdayName } from "@/lib/booking";
+import { formatDateLong, formatDateShort, formatTime, formatTimeRange, weekdayName } from "@/lib/booking";
 import type { AvailableSlot } from "@/lib/types";
 
 const inputClass =
@@ -16,6 +16,7 @@ interface SuccessInfo {
   startTime: string;
   endTime: string;
   partySize: number;
+  rescheduledFrom: { date: string; startTime: string } | null;
 }
 
 export default function BookingWidget({ initialSlots }: { initialSlots: AvailableSlot[] }) {
@@ -93,6 +94,7 @@ export default function BookingWidget({ initialSlots }: { initialSlots: Availabl
         startTime: body.startTime,
         endTime: body.endTime,
         partySize: Number(data.partySize),
+        rescheduledFrom: body.rescheduledFrom ?? null,
       });
       setSelectedSlot(null);
       refreshAvailability();
@@ -109,8 +111,20 @@ export default function BookingWidget({ initialSlots }: { initialSlots: Availabl
     return (
       <div className="rounded-3xl border border-gold-500/40 bg-linen-50 p-8 text-center shadow-sm sm:p-10">
         <CheckCircle2 className="mx-auto text-gold-700" size={48} />
-        <h3 className="mt-4 text-2xl font-semibold text-royal-900">You&apos;re reserved!</h3>
+        <h3 className="mt-4 text-2xl font-semibold text-royal-900">
+          {success.rescheduledFrom ? "You're rescheduled!" : "You're reserved!"}
+        </h3>
         <p className="mt-2 text-slate-600">A confirmation email is on its way to you.</p>
+
+        {success.rescheduledFrom && (
+          <p className="mx-auto mt-4 max-w-md rounded-xl bg-gold-500/10 px-4 py-3 text-sm text-royal-800">
+            We&apos;ve cancelled your previous reservation for{" "}
+            <strong>
+              {formatDateLong(success.rescheduledFrom.date)} at {formatTime(success.rescheduledFrom.startTime)}
+            </strong>{" "}
+            — you&apos;re now booked for the time below.
+          </p>
+        )}
 
         <div className="mx-auto mt-6 max-w-sm space-y-3 rounded-2xl bg-royal-900 p-6 text-left text-linen-50">
           <Row label="Date" value={formatDateLong(success.slotDate)} />
@@ -214,29 +228,27 @@ export default function BookingWidget({ initialSlots }: { initialSlots: Availabl
         {/* Step 2 — Time */}
         {selectedDate && (
           <div>
-            <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-royal-900">
+            <label htmlFor="tourTime" className="mb-3 flex items-center gap-2 text-sm font-semibold text-royal-900">
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gold-500 text-xs font-bold text-royal-900">2</span>
               Choose a time on {formatDateLong(selectedDate)}
-            </p>
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {slotsForDate.map((s) => {
-                const active = selectedSlot?.id === s.id;
-                return (
-                  <button
-                    key={s.id}
-                    onClick={() => setSelectedSlot(s)}
-                    className={`flex items-center justify-between rounded-xl border px-4 py-3 transition-colors ${
-                      active ? "border-gold-500 bg-gold-500/10" : "border-linen-300 hover:border-gold-400"
-                    }`}
-                  >
-                    <span className="flex items-center gap-2 text-sm font-medium text-royal-900">
-                      <Clock size={15} className="text-gold-700" />
-                      {formatTimeRange(s.start_time, s.end_time)}
-                    </span>
-                    <span className="text-xs text-slate-500">{s.remaining} left</span>
-                  </button>
-                );
-              })}
+            </label>
+            <div className="relative max-w-sm">
+              <Clock size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gold-700" />
+              <select
+                id="tourTime"
+                value={selectedSlot?.id ?? ""}
+                onChange={(e) => setSelectedSlot(slotsForDate.find((s) => s.id === e.target.value) ?? null)}
+                className={`${inputClass} appearance-none pl-11`}
+              >
+                <option value="" disabled>
+                  Select a tour time…
+                </option>
+                {slotsForDate.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {formatTimeRange(s.start_time, s.end_time)} · {s.remaining} {s.remaining === 1 ? "spot" : "spots"} left
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         )}

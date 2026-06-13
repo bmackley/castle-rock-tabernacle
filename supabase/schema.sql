@@ -85,6 +85,11 @@ create or replace view public.available_slots as
 -- The overbooking-safe core. Locks the slot row, recomputes remaining
 -- capacity, and inserts the reservation atomically. Two simultaneous
 -- requests for the last seat cannot both succeed.
+--
+-- One active upcoming reservation per email: booking again automatically
+-- cancels the guest's previous upcoming reservation(s) and reports the most
+-- recent one back (a "reschedule"). Re-booking the same slot therefore works
+-- as a party-size change — the old seats are freed before the capacity check.
 create or replace function public.book_slot(
   p_slot_id    uuid,
   p_name       text,
@@ -93,19 +98,25 @@ create or replace function public.book_slot(
   p_party_size int
 )
 returns table (
-  confirmation_code text,
-  slot_date         date,
-  start_time        time,
-  end_time          time
+  confirmation_code     text,
+  slot_date             date,
+  start_time            time,
+  end_time              time,
+  rescheduled_from_date date,
+  rescheduled_from_start time,
+  rescheduled_count     int
 )
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
-  v_slot   public.tour_slots%rowtype;
-  v_booked int;
-  v_code   text;
+  v_slot       public.tour_slots%rowtype;
+  v_booked     int;
+  v_code       text;
+  v_from_date  date;
+  v_from_start time;
+  v_cancelled  int := 0;
 begin
   -- Input validation
   if p_party_size is null or p_party_size < 1 or p_party_size > 20 then
@@ -130,6 +141,33 @@ begin
     raise exception 'That tour time has already passed.' using errcode = 'raise_exception';
   end if;
 
+  -- Serialize bookings per email so two simultaneous requests can't each
+  -- miss the other's reservation (the slot lock alone doesn't cover
+  -- bookings landing on different slots).
+  perform pg_advisory_xact_lock(hashtext(lower(btrim(p_email))));
+
+  -- Auto-reschedule: cancel any upcoming confirmed reservations this guest
+  -- already holds, remembering the most recent one for the notification.
+  select s.slot_date, s.start_time into v_from_date, v_from_start
+    from public.reservations r
+    join public.tour_slots s on s.id = r.slot_id
+   where lower(r.email) = lower(btrim(p_email))
+     and r.status = 'confirmed'
+     and s.slot_date >= current_date
+   order by r.created_at desc
+   limit 1;
+
+  if found then
+    update public.reservations r
+       set status = 'cancelled'
+      from public.tour_slots s
+     where s.id = r.slot_id
+       and lower(r.email) = lower(btrim(p_email))
+       and r.status = 'confirmed'
+       and s.slot_date >= current_date;
+    get diagnostics v_cancelled = row_count;
+  end if;
+
   select coalesce(sum(party_size), 0) into v_booked
     from public.reservations
    where slot_id = p_slot_id and status = 'confirmed';
@@ -148,7 +186,8 @@ begin
   insert into public.reservations (slot_id, name, email, phone, party_size, confirmation_code)
   values (p_slot_id, btrim(p_name), lower(btrim(p_email)), nullif(btrim(p_phone), ''), p_party_size, v_code);
 
-  return query select v_code, v_slot.slot_date, v_slot.start_time, v_slot.end_time;
+  return query select v_code, v_slot.slot_date, v_slot.start_time, v_slot.end_time,
+                      v_from_date, v_from_start, v_cancelled;
 end;
 $$;
 

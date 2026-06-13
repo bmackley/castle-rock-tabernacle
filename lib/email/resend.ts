@@ -75,8 +75,9 @@ export async function sendReservationConfirmation(data: ReservationEmailData) {
       Using Apple Calendar? Open the attached invite.
     </p>
     <p style="font-size:13px;color:#999;line-height:1.6;margin:16px 0 0;">
-      Need to cancel or change your party size?
-      <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">Manage your reservation →</a>
+      Need a different time? Simply book a new time with this same email address and
+      we'll automatically move your reservation. You can also
+      <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">manage or cancel it here →</a>
     </p>`;
 
   const { error } = await resend.emails.send({
@@ -98,14 +99,73 @@ export async function sendReservationConfirmation(data: ReservationEmailData) {
   if (error) throw new Error(error.message);
 }
 
+// → Visitor: their re-booking moved an existing reservation
+export async function sendReservationRescheduled(
+  data: ReservationEmailData & { from: { date: string; startTime: string } }
+) {
+  const when = formatDateLong(data.slotDate);
+  const time = formatTimeRange(data.startTime, data.endTime);
+  const oldWhen = `${formatDateLong(data.from.date)} at ${formatTime(data.from.startTime)}`;
+
+  const inner = `
+    <h1 style="font-size:22px;margin:16px 0 8px;">Your tour has been rescheduled 🔄</h1>
+    <p style="font-size:15px;color:#444;line-height:1.6;margin:0 0 24px;">
+      Hi ${data.name.split(" ")[0]} — since you booked a new time with this email address, we've
+      cancelled your previous reservation for <strong>${oldWhen}</strong>. Here are your new details:
+    </p>
+    <table style="width:100%;border-collapse:collapse;font-size:15px;background:#faf7f0;border-radius:10px;overflow:hidden;">
+      <tr><td style="padding:14px 18px;color:#8a7a55;">Date</td><td style="padding:14px 18px;font-weight:600;text-align:right;">${when}</td></tr>
+      <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Time</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${time}</td></tr>
+      <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Guests</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${data.partySize}</td></tr>
+      <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Confirmation</td><td style="padding:14px 18px;font-weight:700;text-align:right;border-top:1px solid #efe7d6;letter-spacing:0.05em;">${data.code}</td></tr>
+    </table>
+    <p style="font-size:14px;color:#444;line-height:1.6;margin:24px 0 8px;">
+      <strong>Where:</strong> ${fullAddress()}
+    </p>
+    <p style="margin:20px 0 0;text-align:center;">
+      <a href="${googleCalendarUrl({ slotDate: data.slotDate, startTime: data.startTime, endTime: data.endTime, code: data.code })}"
+         style="display:inline-block;background:#b8923f;color:#161f3e;font-weight:600;font-size:14px;padding:10px 22px;border-radius:999px;text-decoration:none;margin:0 4px 8px;">
+        Add to Google Calendar
+      </a>
+      <a href="${outlookCalendarUrl({ slotDate: data.slotDate, startTime: data.startTime, endTime: data.endTime, code: data.code })}"
+         style="display:inline-block;background:#1e2a52;color:#f8f6f1;font-weight:600;font-size:14px;padding:10px 22px;border-radius:999px;text-decoration:none;margin:0 4px 8px;">
+        Add to Outlook
+      </a>
+    </p>
+    <p style="font-size:13px;color:#999;line-height:1.6;margin:16px 0 0;">
+      Remember to remove the old time from your calendar.
+      <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">Manage your reservation →</a>
+    </p>`;
+
+  const { error } = await resend.emails.send({
+    from: SENDER,
+    to: data.to,
+    replyTo: REPLY_TO,
+    subject: `Rescheduled: your Tabernacle tour is now ${when}`,
+    html: shell(inner),
+    attachments: [
+      {
+        filename: "tabernacle-tour.ics",
+        content: Buffer.from(
+          buildIcs({ slotDate: data.slotDate, startTime: data.startTime, endTime: data.endTime, code: data.code })
+        ),
+        contentType: "text/calendar",
+      },
+    ],
+  });
+  if (error) throw new Error(error.message);
+}
+
 // → Admin: a new reservation came in
-export async function sendAdminNewReservation(data: ReservationEmailData & { phone: string | null }) {
+export async function sendAdminNewReservation(
+  data: ReservationEmailData & { phone: string | null; rescheduled?: boolean }
+) {
   if (!ADMIN_TO) return;
   const when = formatDateLong(data.slotDate);
   const time = formatTimeRange(data.startTime, data.endTime);
 
   const inner = `
-    <h1 style="font-size:20px;margin:16px 0 16px;">New tour reservation</h1>
+    <h1 style="font-size:20px;margin:16px 0 16px;">${data.rescheduled ? "Reservation rescheduled" : "New tour reservation"}</h1>
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
       <tr><td style="padding:8px 0;color:#888;width:90px;">Guest</td><td style="padding:8px 0;font-weight:600;">${data.name}</td></tr>
       <tr><td style="padding:8px 0;color:#888;">Email</td><td style="padding:8px 0;"><a href="mailto:${data.to}" style="color:#9a7b3f;">${data.to}</a></td></tr>
@@ -117,7 +177,7 @@ export async function sendAdminNewReservation(data: ReservationEmailData & { pho
     <p style="margin:20px 0 0;"><a href="${APP_URL}/admin/reservations" style="color:#9a7b3f;font-size:14px;">View all reservations →</a></p>`;
 
   await resend.emails
-    .send({ from: SENDER, to: ADMIN_TO, replyTo: data.to, subject: `New reservation — ${data.name} (${when})`, html: shell(inner) })
+    .send({ from: SENDER, to: ADMIN_TO, replyTo: data.to, subject: `${data.rescheduled ? "Rescheduled" : "New reservation"} — ${data.name} (${when})`, html: shell(inner) })
     .catch(() => {}); // non-blocking
 }
 
