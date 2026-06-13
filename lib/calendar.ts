@@ -21,7 +21,7 @@ function stamp(date: string, time: string): string {
 
 function eventDetails(input: CalendarEventInput) {
   return {
-    title: `Tabernacle Tour — ${site.name}`,
+    title: `Tabernacle Tour: ${site.name}`,
     description: `Free guided tour of the ${site.name}. Please arrive 10 minutes early.\n\nConfirmation: ${input.code}\nManage your reservation: ${APP_URL}/reservation/${input.code}`,
     location: fullAddress(),
     start: stamp(input.slotDate, input.startTime),

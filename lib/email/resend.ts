@@ -110,7 +110,7 @@ export async function sendReservationRescheduled(
   const inner = `
     <h1 style="font-size:22px;margin:16px 0 8px;">Your tour has been rescheduled 🔄</h1>
     <p style="font-size:15px;color:#444;line-height:1.6;margin:0 0 24px;">
-      Hi ${data.name.split(" ")[0]} — since you booked a new time with this email address, we've
+      Hi ${data.name.split(" ")[0]}, since you booked a new time with this email address, we've
       cancelled your previous reservation for <strong>${oldWhen}</strong>. Here are your new details:
     </p>
     <table style="width:100%;border-collapse:collapse;font-size:15px;background:#faf7f0;border-radius:10px;overflow:hidden;">
@@ -177,7 +177,7 @@ export async function sendAdminNewReservation(
     <p style="margin:20px 0 0;"><a href="${APP_URL}/admin/reservations" style="color:#9a7b3f;font-size:14px;">View all reservations →</a></p>`;
 
   await resend.emails
-    .send({ from: SENDER, to: ADMIN_TO, replyTo: data.to, subject: `${data.rescheduled ? "Rescheduled" : "New reservation"} — ${data.name} (${when})`, html: shell(inner) })
+    .send({ from: SENDER, to: ADMIN_TO, replyTo: data.to, subject: `${data.rescheduled ? "Rescheduled" : "New reservation"}: ${data.name} (${when})`, html: shell(inner) })
     .catch(() => {}); // non-blocking
 }
 

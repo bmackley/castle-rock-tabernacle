@@ -12,7 +12,7 @@ export const learningGuides: LearningGuide[] = [
   {
     title: "The Lord's Way of Teaching",
     summary:
-      "The Lord teaches His children through symbols — simple, powerful likenesses found in the scriptures, ordinances, and the world around us. As we study with faith, symbols help eternal principles become personal, memorable, and transformative, bearing record of Christ in both temporal and spiritual ways.",
+      "The Lord teaches His children through symbols: simple, powerful likenesses found in the scriptures, ordinances, and the world around us. As we study with faith, symbols help eternal principles become personal, memorable, and transformative, bearing record of Christ in both temporal and spiritual ways.",
     pdfUrl:
       "/guides/1-the-lords-way-of-teaching.pdf",
   },
@@ -33,28 +33,28 @@ export const learningGuides: LearningGuide[] = [
   {
     title: "Organize Thyself",
     summary:
-      "To receive the Lord in His sanctuary, Israel was organized around and focused on the Tabernacle. It mirrored His heavenly abode among them, and it was a shadow of the latter-day gathering of Israel around and in His holy house — teaching all who covenant with God who they are and to whom they belong.",
+      "To receive the Lord in His sanctuary, Israel was organized around and focused on the Tabernacle. It mirrored His heavenly abode among them, and it was a shadow of the latter-day gathering of Israel around and in His holy house, teaching all who covenant with God who they are and to whom they belong.",
     pdfUrl:
       "/guides/4-organize-thyself.pdf",
   },
   {
     title: "The Lord's Sanctuary",
     summary:
-      "The Tabernacle reveals a progression of holiness — transcending this world toward heavenly space through the Atonement. Each part is a shadow or type of the Savior's mission and atoning sacrifice, a reminder of God's covenants with Israel and His desire to have us return to Him.",
+      "The Tabernacle reveals a progression of holiness, transcending this world toward heavenly space through the Atonement. Each part is a shadow or type of the Savior's mission and atoning sacrifice, a reminder of God's covenants with Israel and His desire to have us return to Him.",
     pdfUrl:
       "/guides/5-the-lords-sanctuary.pdf",
   },
   {
     title: "Atonement",
     summary:
-      "The sacrificial ordinances provided atonement for the individual, the priest, and all of Israel — the Lord's way of teaching the process of repentance and the price of forgiveness. They foreshadowed the great and final sacrifice that would be made for all mankind by the Son of God.",
+      "The sacrificial ordinances provided atonement for the individual, the priest, and all of Israel. They were the Lord's way of teaching the process of repentance and the price of forgiveness, and they foreshadowed the great and final sacrifice that would be made for all mankind by the Son of God.",
     pdfUrl:
       "/guides/6-atonement.pdf",
   },
   {
     title: "Salvation",
     summary:
-      "The shadows and types of the Tabernacle prepare all to become holy and enter the Lord's presence — possible only through the sacrifice of the Son of God foreshadowed in its ordinances. The Tabernacle reveals the power of covenants and the saving grace of the Lord's Plan of Salvation: the Way back to Him.",
+      "The shadows and types of the Tabernacle prepare all to become holy and enter the Lord's presence, possible only through the sacrifice of the Son of God foreshadowed in its ordinances. The Tabernacle reveals the power of covenants and the saving grace of the Lord's Plan of Salvation: the Way back to Him.",
     pdfUrl:
       "/guides/7-salvation.pdf",
   },
@@ -78,14 +78,14 @@ export const videoSeries = {
   title: "Messages of Christ",
   narrator: "Daniel Smith",
   intro:
-    "Videos from the Messages of Christ series, produced and narrated by Daniel Smith, bring further insight and depth — the vessels of the Tabernacle, the High Priest, the sacrificial ordinances, and their symbolism pointing to Jesus Christ and His mission.",
+    "Videos from the Messages of Christ series, produced and narrated by Daniel Smith, bring further insight and depth into the vessels of the Tabernacle, the High Priest, the sacrificial ordinances, and their symbolism pointing to Jesus Christ and His mission.",
 };
 
 export const videoSections: VideoSection[] = [
   {
     title: "Start with the Tabernacle",
     intro:
-      "An overview of the Tabernacle of Moses — what it was, what it looked like, and the pattern it shares with Eden and the temple.",
+      "An overview of the Tabernacle of Moses: what it was, what it looked like, and the pattern it shares with Eden and the temple.",
     videos: [
       {
         youtubeId: "wVUcJUJBFMU",
@@ -103,13 +103,13 @@ export const videoSections: VideoSection[] = [
         youtubeId: "1mFGsLEpKKk",
         title: "Tabernacle of Moses",
         description:
-          "Highlights of a full Tabernacle replica — a glimpse of what walking through the ancient sanctuary feels like.",
+          "Highlights of a full Tabernacle replica, giving a glimpse of what walking through the ancient sanctuary feels like.",
       },
       {
         youtubeId: "vQRQZqn3XPU",
         title: "The Temple Hidden in the Garden of Eden",
         description:
-          "Hidden within the Bible is a sacred blueprint — a lost paradise, the tragedy of exile, and the promise of return to God's presence through the Messiah.",
+          "Hidden within the Bible is a sacred blueprint: a lost paradise, the tragedy of exile, and the promise of return to God's presence through the Messiah.",
       },
       {
         youtubeId: "EuRj9tLHXr4",
@@ -122,7 +122,7 @@ export const videoSections: VideoSection[] = [
   {
     title: "The Courtyard",
     intro:
-      "The gate, the altar of sacrifice, and the bronze laver — the first steps toward the presence of God.",
+      "The gate, the altar of sacrifice, and the bronze laver: the first steps toward the presence of God.",
     videos: [
       {
         youtubeId: "9opTZb54IA8",
@@ -140,7 +140,7 @@ export const videoSections: VideoSection[] = [
         youtubeId: "-c5uWzQfILg",
         title: "Finding Christ in the Altar of Sacrifice",
         description:
-          "At the bronze altar Israel learned that only through the shedding of blood could sins be remitted — sacrifices that pointed to the cross of Calvary.",
+          "At the bronze altar Israel learned that only through the shedding of blood could sins be remitted, in sacrifices that pointed to the cross of Calvary.",
       },
       {
         youtubeId: "luYWCpE_P_U",
@@ -165,13 +165,13 @@ export const videoSections: VideoSection[] = [
   {
     title: "The Holy Place",
     intro:
-      "The table of showbread, the golden menorah, and the altar of incense — light, sustenance, and prayer in the daily worship of the priests.",
+      "The table of showbread, the golden menorah, and the altar of incense: light, sustenance, and prayer in the daily worship of the priests.",
     videos: [
       {
         youtubeId: "HnIOkumUNTw",
         title: "The Table of Showbread, Explained",
         description:
-          "Each Sabbath the priests shared the twelve loaves in the Lord's presence. Jesus called Himself the bread of life — partake, and live forever.",
+          "Each Sabbath the priests shared the twelve loaves in the Lord's presence. Jesus called Himself the bread of life: partake, and live forever.",
       },
       {
         youtubeId: "GYoJNm53KEk",
@@ -183,7 +183,7 @@ export const videoSections: VideoSection[] = [
         youtubeId: "S9wLTu1ygSo",
         title: "Finding Christ in the Golden Menorah",
         description:
-          "The menorah was the only source of light in the holy place — teaching us of our true source of light, even Jesus Christ.",
+          "The menorah was the only source of light in the holy place, teaching us of our true source of light, even Jesus Christ.",
       },
       {
         youtubeId: "3CiAixEI8go",
@@ -195,7 +195,7 @@ export const videoSections: VideoSection[] = [
         youtubeId: "ZS79wnUUl7A",
         title: "The Altar of Incense, Explained",
         description:
-          "Morning and evening the priest burned incense before the veil, offering prayers for all Israel — a symbol of prayer joined to the Savior's sacrifice.",
+          "Morning and evening the priest burned incense before the veil, offering prayers for all Israel, a symbol of prayer joined to the Savior's sacrifice.",
       },
       {
         youtubeId: "STrFTcP2kAs",
@@ -214,7 +214,7 @@ export const videoSections: VideoSection[] = [
         youtubeId: "3a9g8Q7_Wpk",
         title: "Ark of the Covenant, Explained",
         description:
-          "The ark stood beyond the veil in the Holy of Holies, entered only on the Day of Atonement — symbolizing the Atonement of Jesus Christ that covers and blots out our sins.",
+          "The ark stood beyond the veil in the Holy of Holies, entered only on the Day of Atonement, symbolizing the Atonement of Jesus Christ that covers and blots out our sins.",
       },
       {
         youtubeId: "aLKsk3lJf4Y",
@@ -226,13 +226,13 @@ export const videoSections: VideoSection[] = [
         youtubeId: "4UYT-0AmlnA",
         title: "Understanding the Day of Atonement",
         description:
-          "Yom Kippur, the most holy day of the Jewish calendar — no other ancient ritual comes closer to the full meaning of the Atonement of Jesus Christ.",
+          "Yom Kippur, the most holy day of the Jewish calendar. No other ancient ritual comes closer to the full meaning of the Atonement of Jesus Christ.",
       },
       {
         youtubeId: "fssPmwOhRf0",
         title: "The Day of Atonement — Leviticus 16",
         description:
-          "A reenactment of the Day of Atonement — the scapegoat, the sacrifices, and the high priest entering the Holy of Holies — drawn directly from Leviticus 16.",
+          "A reenactment of the Day of Atonement (the scapegoat, the sacrifices, and the high priest entering the Holy of Holies), drawn directly from Leviticus 16.",
       },
     ],
   },

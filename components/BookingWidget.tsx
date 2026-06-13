@@ -122,7 +122,7 @@ export default function BookingWidget({ initialSlots }: { initialSlots: Availabl
             <strong>
               {formatDateLong(success.rescheduledFrom.date)} at {formatTime(success.rescheduledFrom.startTime)}
             </strong>{" "}
-            — you&apos;re now booked for the time below.
+            You&apos;re now booked for the time below.
           </p>
         )}
 

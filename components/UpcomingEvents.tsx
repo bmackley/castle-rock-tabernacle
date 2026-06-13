@@ -88,7 +88,7 @@ export default async function UpcomingEvents() {
                   </a>
                 ) : (
                   <p className="text-sm font-medium text-gold-300 lg:shrink-0">
-                    All are welcome — no reservation needed
+                    All are welcome, no reservation needed
                   </p>
                 )}
               </div>

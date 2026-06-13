@@ -9,7 +9,7 @@ import { learningGuides, videoSeries, videoSections } from "@/lib/content";
 export const metadata: Metadata = {
   title: "Learn More",
   description:
-    "Free learning guides and the Messages of Christ video series — how the ancient Tabernacle teaches us about Jesus Christ.",
+    "Free learning guides and the Messages of Christ video series: how the ancient Tabernacle teaches us about Jesus Christ.",
 };
 
 export default function LearnMorePage() {
@@ -24,7 +24,7 @@ export default function LearnMorePage() {
           <span className="gold-rule mt-5" />
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-slate-600">
             Seven free learning guides teach about the Tabernacle and its vessels, the High Priest,
-            the sacrificial ordinances, and their symbolism of Jesus Christ and His mission — with
+            the sacrificial ordinances, and their symbolism of Jesus Christ and His mission, with
             videos from the <em>Messages of Christ</em> series to bring further insight and depth.
           </p>
         </div>
@@ -83,7 +83,7 @@ export default function LearnMorePage() {
             <h2 className="mt-3 text-3xl font-semibold text-royal-900 sm:text-4xl">Behind the veil</h2>
             <p className="mt-4 text-base leading-relaxed text-slate-600">
               At the heart of the Tabernacle stood the ark of the covenant, overshadowed by two
-              cherubim above the mercy seat — the meeting place of God and man. The veil that
+              cherubim above the mercy seat, the meeting place of God and man. The veil that
               concealed it was torn at the Savior&apos;s death, opening the way into His presence.
               Here the whole pattern finds its purpose: Christ, our great High Priest.
             </p>

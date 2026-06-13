@@ -70,7 +70,7 @@ export default function SlotGenerator() {
         <h2 className="text-lg font-semibold text-royal-900">Generate tour slots</h2>
       </div>
       <p className="mt-1 text-sm text-slate-600">
-        Set a date range and a daily schedule — we&apos;ll create every tour time at once.
+        Set a date range and a daily schedule and we&apos;ll create every tour time at once.
       </p>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">

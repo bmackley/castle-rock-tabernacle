@@ -184,7 +184,7 @@ export default async function ReservationPage({
               <Link href="/plan-your-visit#reserve" className="font-medium text-gold-700 hover:text-gold-600">
                 book a new time
               </Link>{" "}
-              with the same email address — we&apos;ll automatically cancel this reservation and
+              with the same email address. We&apos;ll automatically cancel this reservation and
               email you the new details.
             </p>
 
@@ -209,7 +209,7 @@ export default async function ReservationPage({
           )}
           <p className="mt-3 text-sm text-slate-600">
             {cancelled
-              ? "Changed your mind? Tours are free — pick a new time any time."
+              ? "Changed your mind? Tours are free. Pick a new time any time."
               : "We hope you enjoyed your walk through the Tabernacle. You're always welcome back."}
           </p>
           <div className="mt-5">

@@ -55,7 +55,7 @@ export default function HomePage() {
       <section className="border-b border-linen-200 bg-linen-100">
         <div className="mx-auto grid max-w-5xl gap-px overflow-hidden sm:grid-cols-3">
           {[
-            { icon: Ticket, label: "Free admission", detail: "No cost to visit — all are welcome" },
+            { icon: Ticket, label: "Free admission", detail: "No cost to visit. All are welcome." },
             { icon: Clock, label: "About 45 minutes", detail: "A guided, walk-through experience" },
             { icon: MapPin, label: fullAddress(), detail: "Easy to find, free parking" },
           ].map((f) => (
@@ -75,7 +75,7 @@ export default function HomePage() {
             <SectionHeading
               eyebrow="The Experience"
               title="An ancient pattern, made to be walked through"
-              subtitle="The Tabernacle was the portable sanctuary God gave to Israel — a tent of meeting where heaven touched earth. Our recreation lets you stand in the courtyard, the Holy Place, and before the veil of the Holy of Holies, as a guide unfolds the meaning of each station."
+              subtitle="The Tabernacle was the portable sanctuary God gave to Israel, a tent of meeting where heaven touched earth. Our recreation lets you stand in the courtyard, the Holy Place, and before the veil of the Holy of Holies, as a guide unfolds the meaning of each station."
             />
             <ul className="mt-8 space-y-4">
               {[

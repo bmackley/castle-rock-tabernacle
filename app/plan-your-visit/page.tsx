@@ -46,7 +46,7 @@ const faqs = [
   },
   {
     q: "How much does the tour cost?",
-    a: "Nothing — admission and the guided tour are completely free. Reservations simply help us keep groups a comfortable size.",
+    a: "Nothing. Admission and the guided tour are completely free. Reservations simply help us keep groups a comfortable size.",
   },
   {
     q: "How long does a tour take?",
@@ -58,7 +58,7 @@ const faqs = [
   },
   {
     q: "Can I bring a large group or congregation?",
-    a: "Yes — choose a party size when reserving, and if your group is larger than the spots remaining in a single time slot, contact us and we'll help arrange a time for you.",
+    a: "Yes. Choose a party size when reserving, and if your group is larger than the spots remaining in a single time slot, contact us and we'll help arrange a time for you.",
   },
   {
     q: "Is the tour wheelchair accessible?",
@@ -66,7 +66,7 @@ const faqs = [
   },
   {
     q: "What if my plans change?",
-    a: "No problem. Your confirmation email includes a link to manage or cancel your reservation — cancelling frees the spot for someone else.",
+    a: "No problem. Your confirmation email includes a link to manage or cancel your reservation. Cancelling frees the spot for someone else.",
   },
 ];
 
@@ -126,7 +126,7 @@ export default async function PlanYourVisitPage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <Accessibility size={18} className="mt-0.5 shrink-0 text-gold-700" />
-                  <span>The route is level and accessible for wheelchairs and strollers — all ages are welcome.</span>
+                  <span>The route is level and accessible for wheelchairs and strollers. All ages are welcome.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <MapPin size={18} className="mt-0.5 shrink-0 text-gold-700" />
