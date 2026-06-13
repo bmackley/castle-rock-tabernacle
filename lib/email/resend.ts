@@ -45,7 +45,7 @@ export async function sendReservationConfirmation(data: ReservationEmailData) {
   const time = formatTime(data.startTime);
 
   const inner = `
-    <h1 style="font-size:22px;margin:16px 0 8px;">You're reserved, ${data.name.split(" ")[0]} 🎟️</h1>
+    <h1 style="font-size:22px;margin:16px 0 8px;">You're reserved, ${data.name.split(" ")[0]}</h1>
     <p style="font-size:15px;color:#444;line-height:1.6;margin:0 0 24px;">
       Thank you for reserving a guided walk through the Tabernacle. Here are your details:
     </p>
@@ -54,7 +54,6 @@ export async function sendReservationConfirmation(data: ReservationEmailData) {
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Time</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${time}</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Duration</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">About 45 minutes</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Guests</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${data.partySize}</td></tr>
-      <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Confirmation</td><td style="padding:14px 18px;font-weight:700;text-align:right;border-top:1px solid #efe7d6;letter-spacing:0.05em;">${data.code}</td></tr>
     </table>
     <p style="font-size:14px;color:#444;line-height:1.6;margin:24px 0 8px;">
       <strong>Where:</strong> ${fullAddress()}
@@ -109,7 +108,7 @@ export async function sendReservationRescheduled(
   const oldWhen = `${formatDateLong(data.from.date)} at ${formatTime(data.from.startTime)}`;
 
   const inner = `
-    <h1 style="font-size:22px;margin:16px 0 8px;">Your tour has been rescheduled 🔄</h1>
+    <h1 style="font-size:22px;margin:16px 0 8px;">Your tour has been rescheduled</h1>
     <p style="font-size:15px;color:#444;line-height:1.6;margin:0 0 24px;">
       Hi ${data.name.split(" ")[0]}, since you booked a new time with this email address, we've
       cancelled your previous reservation for <strong>${oldWhen}</strong>. Here are your new details:
@@ -119,7 +118,6 @@ export async function sendReservationRescheduled(
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Time</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${time}</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Duration</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">About 45 minutes</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Guests</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${data.partySize}</td></tr>
-      <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Confirmation</td><td style="padding:14px 18px;font-weight:700;text-align:right;border-top:1px solid #efe7d6;letter-spacing:0.05em;">${data.code}</td></tr>
     </table>
     <p style="font-size:14px;color:#444;line-height:1.6;margin:24px 0 8px;">
       <strong>Where:</strong> ${fullAddress()}
@@ -188,7 +186,7 @@ export async function sendTourReminder(data: ReservationEmailData) {
   const when = formatDateLong(data.slotDate);
   const time = formatTime(data.startTime);
   const inner = `
-    <h1 style="font-size:22px;margin:16px 0 8px;">See you tomorrow 👋</h1>
+    <h1 style="font-size:22px;margin:16px 0 8px;">See you tomorrow</h1>
     <p style="font-size:15px;color:#444;line-height:1.6;margin:0 0 16px;">
       This is a friendly reminder of your Tabernacle tour:
     </p>
@@ -199,7 +197,7 @@ export async function sendTourReminder(data: ReservationEmailData) {
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Where</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${fullAddress()}</td></tr>
     </table>
     <p style="font-size:13px;color:#999;line-height:1.6;margin:16px 0 0;">
-      Confirmation ${data.code}. Please arrive 10 minutes early.
+      Please arrive 10 minutes early.
       <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">Can't make it? Cancel here →</a>
     </p>`;
   await resend.emails
@@ -211,7 +209,7 @@ export async function sendTourReminder(data: ReservationEmailData) {
 export async function sendTourMorningReminder(data: ReservationEmailData) {
   const time = formatTime(data.startTime);
   const inner = `
-    <h1 style="font-size:22px;margin:16px 0 8px;">Your tour is today 🌅</h1>
+    <h1 style="font-size:22px;margin:16px 0 8px;">Your tour is today</h1>
     <p style="font-size:15px;color:#444;line-height:1.6;margin:0 0 16px;">
       Good morning, ${data.name.split(" ")[0]}! We're looking forward to welcoming you at the Tabernacle today.
     </p>
@@ -226,7 +224,6 @@ export async function sendTourMorningReminder(data: ReservationEmailData) {
       <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress())}" style="color:#9a7b3f;">Get directions →</a>
     </p>
     <p style="font-size:13px;color:#999;line-height:1.6;margin:16px 0 0;">
-      Confirmation ${data.code}.
       <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">Can't make it? Cancel here →</a>
     </p>`;
   await resend.emails
