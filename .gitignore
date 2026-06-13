@@ -30,3 +30,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 supabase/migrate-wix.sql
+supabase/wix-export.json
+supabase/devotional-guests.csv
