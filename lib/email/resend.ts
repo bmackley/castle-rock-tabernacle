@@ -74,10 +74,14 @@ export async function sendReservationConfirmation(data: ReservationEmailData) {
     <p style="font-size:12px;color:#999;text-align:center;margin:8px 0 0;">
       Using Apple Calendar? Open the attached invite.
     </p>
-    <p style="font-size:13px;color:#999;line-height:1.6;margin:16px 0 0;">
-      Need a different time? Simply book a new time with this same email address and
-      we'll automatically move your reservation. You can also
-      <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">manage or cancel it here →</a>
+    <p style="margin:24px 0 0;text-align:center;">
+      <a href="${APP_URL}/reservation/${data.code}"
+         style="display:inline-block;background:#faf7f0;color:#161f3e;font-weight:600;font-size:14px;padding:10px 22px;border-radius:999px;text-decoration:none;border:1px solid #d4b97a;">
+        Manage or Cancel Reservation
+      </a>
+    </p>
+    <p style="font-size:13px;color:#999;line-height:1.6;margin:12px 0 0;text-align:center;">
+      Need a different time? Visit the link above to cancel, then book a new time.
     </p>`;
 
   const { error } = await resend.emails.send({
@@ -132,9 +136,11 @@ export async function sendReservationRescheduled(
         Add to Outlook
       </a>
     </p>
-    <p style="font-size:13px;color:#999;line-height:1.6;margin:16px 0 0;">
-      Remember to remove the old time from your calendar.
-      <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">Manage your reservation →</a>
+    <p style="margin:24px 0 0;text-align:center;">
+      <a href="${APP_URL}/reservation/${data.code}"
+         style="display:inline-block;background:#faf7f0;color:#161f3e;font-weight:600;font-size:14px;padding:10px 22px;border-radius:999px;text-decoration:none;border:1px solid #d4b97a;">
+        Manage or Cancel Reservation
+      </a>
     </p>`;
 
   const { error } = await resend.emails.send({
@@ -158,14 +164,14 @@ export async function sendReservationRescheduled(
 
 // → Admin: a new reservation came in
 export async function sendAdminNewReservation(
-  data: ReservationEmailData & { phone: string | null; rescheduled?: boolean }
+  data: ReservationEmailData & { phone: string | null }
 ) {
   if (!ADMIN_TO) return;
   const when = formatDateLong(data.slotDate);
   const time = formatTime(data.startTime);
 
   const inner = `
-    <h1 style="font-size:20px;margin:16px 0 16px;">${data.rescheduled ? "Reservation rescheduled" : "New tour reservation"}</h1>
+    <h1 style="font-size:20px;margin:16px 0 16px;">New tour reservation</h1>
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
       <tr><td style="padding:8px 0;color:#888;width:90px;">Guest</td><td style="padding:8px 0;font-weight:600;">${data.name}</td></tr>
       <tr><td style="padding:8px 0;color:#888;">Email</td><td style="padding:8px 0;"><a href="mailto:${data.to}" style="color:#9a7b3f;">${data.to}</a></td></tr>
@@ -177,7 +183,7 @@ export async function sendAdminNewReservation(
     <p style="margin:20px 0 0;"><a href="${APP_URL}/admin/reservations" style="color:#9a7b3f;font-size:14px;">View all reservations →</a></p>`;
 
   await resend.emails
-    .send({ from: SENDER, to: ADMIN_TO, replyTo: data.to, subject: `${data.rescheduled ? "Rescheduled" : "New reservation"}: ${data.name} (${when})`, html: shell(inner) })
+    .send({ from: SENDER, to: ADMIN_TO, replyTo: data.to, subject: `New reservation: ${data.name} (${when})`, html: shell(inner) })
     .catch(() => {}); // non-blocking
 }
 
@@ -196,9 +202,14 @@ export async function sendTourReminder(data: ReservationEmailData) {
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Guests</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${data.partySize}</td></tr>
       <tr><td style="padding:14px 18px;color:#8a7a55;border-top:1px solid #efe7d6;">Where</td><td style="padding:14px 18px;font-weight:600;text-align:right;border-top:1px solid #efe7d6;">${fullAddress()}</td></tr>
     </table>
-    <p style="font-size:13px;color:#999;line-height:1.6;margin:16px 0 0;">
+    <p style="font-size:13px;color:#999;line-height:1.6;margin:16px 0 8px;">
       Please arrive 10 minutes early.
-      <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">Can't make it? Cancel here →</a>
+    </p>
+    <p style="margin:8px 0 0;text-align:center;">
+      <a href="${APP_URL}/reservation/${data.code}"
+         style="display:inline-block;background:#faf7f0;color:#161f3e;font-weight:600;font-size:14px;padding:10px 22px;border-radius:999px;text-decoration:none;border:1px solid #d4b97a;">
+        Manage or Cancel Reservation
+      </a>
     </p>`;
   await resend.emails
     .send({ from: SENDER, to: data.to, replyTo: REPLY_TO, subject: `Reminder: your Tabernacle tour is tomorrow`, html: shell(inner) })
@@ -223,8 +234,11 @@ export async function sendTourMorningReminder(data: ReservationEmailData) {
       Please arrive 10 minutes early so your group can begin together. Free parking is available on site.
       <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress())}" style="color:#9a7b3f;">Get directions →</a>
     </p>
-    <p style="font-size:13px;color:#999;line-height:1.6;margin:16px 0 0;">
-      <a href="${APP_URL}/reservation/${data.code}" style="color:#9a7b3f;">Can't make it? Cancel here →</a>
+    <p style="margin:16px 0 0;text-align:center;">
+      <a href="${APP_URL}/reservation/${data.code}"
+         style="display:inline-block;background:#faf7f0;color:#161f3e;font-weight:600;font-size:14px;padding:10px 22px;border-radius:999px;text-decoration:none;border:1px solid #d4b97a;">
+        Manage or Cancel Reservation
+      </a>
     </p>`;
   await resend.emails
     .send({

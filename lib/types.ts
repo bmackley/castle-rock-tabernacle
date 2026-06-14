@@ -55,9 +55,4 @@ export interface BookingResult {
   slot_date: string;
   start_time: string;
   end_time: string;
-  // Set when booking again with an email that already had an upcoming
-  // reservation — the previous one is auto-cancelled (a "reschedule").
-  rescheduled_from_date: string | null;
-  rescheduled_from_start: string | null;
-  rescheduled_count: number;
 }

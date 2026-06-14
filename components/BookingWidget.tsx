@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, Clock, Users, CheckCircle2, Ticket, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import AddToCalendar from "@/components/AddToCalendar";
-import { formatDateLong, formatDateShort, formatTime, weekdayName } from "@/lib/booking";
+import { formatDateShort, formatTime, weekdayName } from "@/lib/booking";
 import type { AvailableSlot } from "@/lib/types";
 
 const inputClass =
@@ -16,7 +16,6 @@ interface SuccessInfo {
   startTime: string;
   endTime: string;
   partySize: number;
-  rescheduledFrom: { date: string; startTime: string } | null;
 }
 
 export default function BookingWidget({ initialSlots }: { initialSlots: AvailableSlot[] }) {
@@ -94,7 +93,6 @@ export default function BookingWidget({ initialSlots }: { initialSlots: Availabl
         startTime: body.startTime,
         endTime: body.endTime,
         partySize: Number(data.partySize),
-        rescheduledFrom: body.rescheduledFrom ?? null,
       });
       setSelectedSlot(null);
       refreshAvailability();
@@ -111,20 +109,8 @@ export default function BookingWidget({ initialSlots }: { initialSlots: Availabl
     return (
       <div className="rounded-3xl border border-gold-500/40 bg-linen-50 p-8 text-center shadow-sm sm:p-10">
         <CheckCircle2 className="mx-auto text-gold-700" size={48} />
-        <h3 className="mt-4 text-2xl font-semibold text-royal-900">
-          {success.rescheduledFrom ? "You're rescheduled!" : "You're reserved!"}
-        </h3>
+        <h3 className="mt-4 text-2xl font-semibold text-royal-900">You&apos;re reserved!</h3>
         <p className="mt-2 text-slate-600">A confirmation email is on its way to you.</p>
-
-        {success.rescheduledFrom && (
-          <p className="mx-auto mt-4 max-w-md rounded-xl bg-gold-500/10 px-4 py-3 text-sm text-royal-800">
-            We&apos;ve cancelled your previous reservation for{" "}
-            <strong>
-              {formatDateLong(success.rescheduledFrom.date)} at {formatTime(success.rescheduledFrom.startTime)}
-            </strong>{" "}
-            You&apos;re now booked for the time below.
-          </p>
-        )}
 
         <div className="mx-auto mt-6 max-w-sm space-y-3 rounded-2xl bg-royal-900 p-6 text-left text-linen-50">
           <Row label="Date" value={formatDateLong(success.slotDate)} />
