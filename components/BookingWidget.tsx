@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, Clock, Users, CheckCircle2, Ticket, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import AddToCalendar from "@/components/AddToCalendar";
-import { formatDateShort, formatTime, weekdayName } from "@/lib/booking";
+import { formatDateLong, formatDateShort, formatTime, weekdayName } from "@/lib/booking";
 import type { AvailableSlot } from "@/lib/types";
 
 const inputClass =
