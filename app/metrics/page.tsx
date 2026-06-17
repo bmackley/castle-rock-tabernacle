@@ -109,37 +109,37 @@ export default async function MetricsPage() {
               <thead>
                 <tr className="border-b border-linen-200 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                   <th className="px-6 py-3">Date</th>
-                  <th className="px-4 py-3 text-right">Slots</th>
-                  <th className="px-4 py-3 text-right">Capacity</th>
-                  <th className="px-4 py-3 text-right">Reservations</th>
-                  <th className="px-4 py-3 text-right">Guests</th>
-                  <th className="px-4 py-3 text-right">Checked In</th>
-                  <th className="px-6 py-3 text-right">Filled</th>
+                  <th className="px-4 py-3 text-right">Filled</th>
+                  <th className="px-4 py-3 text-right">Reservations / Slots</th>
+                  <th className="px-4 py-3 text-right">Guests / Capacity</th>
+                  <th className="px-6 py-3 text-right">Checked In</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-linen-200">
                 {days.map((d) => {
                   const pct = d.capacity > 0 ? Math.round((d.guests / d.capacity) * 100) : 0;
+                  const fillColor =
+                    pct >= 100 ? "bg-green-100 text-green-800" :
+                    pct >= 50  ? "bg-gold-500/20 text-gold-800" :
+                                 "bg-linen-200 text-slate-600";
                   return (
                     <tr key={d.date} className="hover:bg-linen-100">
                       <td className="px-6 py-4">
                         <p className="font-medium text-royal-900">{weekdayName(d.date)}</p>
                         <p className="text-slate-500">{formatDateLong(d.date)}</p>
                       </td>
-                      <td className="px-4 py-4 text-right text-royal-900">{d.slots}</td>
-                      <td className="px-4 py-4 text-right text-royal-900">{d.capacity}</td>
-                      <td className="px-4 py-4 text-right text-royal-900">{d.confirmed}</td>
-                      <td className="px-4 py-4 text-right font-semibold text-royal-900">{d.guests}</td>
-                      <td className="px-4 py-4 text-right text-royal-900">{d.checkedIn}</td>
-                      <td className="px-6 py-4 text-right">
-                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          pct >= 90 ? "bg-scarlet-600/10 text-scarlet-700" :
-                          pct >= 60 ? "bg-gold-500/20 text-gold-800" :
-                          "bg-linen-200 text-slate-600"
-                        }`}>
+                      <td className="px-4 py-4 text-right">
+                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${fillColor}`}>
                           {pct}%
                         </span>
                       </td>
+                      <td className="px-4 py-4 text-right text-royal-900">
+                        {d.confirmed} <span className="text-slate-400">/ {d.slots}</span>
+                      </td>
+                      <td className="px-4 py-4 text-right font-semibold text-royal-900">
+                        {d.guests} <span className="font-normal text-slate-400">/ {d.capacity}</span>
+                      </td>
+                      <td className="px-6 py-4 text-right text-royal-900">{d.checkedIn}</td>
                     </tr>
                   );
                 })}
@@ -161,10 +161,9 @@ export default async function MetricsPage() {
                   <thead>
                     <tr className="border-b border-linen-200 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                       <th className="px-6 py-2">Time</th>
-                      <th className="px-4 py-2 text-right">Capacity</th>
-                      <th className="px-4 py-2 text-right">Guests</th>
-                      <th className="px-4 py-2 text-right">Checked In</th>
-                      <th className="px-6 py-2 text-right">Status</th>
+                      <th className="px-4 py-2 text-right">Filled</th>
+                      <th className="px-4 py-2 text-right">Guests / Capacity</th>
+                      <th className="px-6 py-2 text-right">Checked In</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-linen-200">
@@ -172,21 +171,23 @@ export default async function MetricsPage() {
                       const confirmed = s.reservations.filter((r) => r.status === "confirmed");
                       const guests = confirmed.reduce((n, r) => n + r.party_size, 0);
                       const checkedIn = s.reservations.filter((r) => r.checked_in && r.status === "confirmed").length;
+                      const pct = s.capacity > 0 ? Math.round((guests / s.capacity) * 100) : 0;
+                      const fillColor =
+                        pct >= 100 ? "bg-green-100 text-green-800" :
+                        pct >= 50  ? "bg-gold-500/20 text-gold-800" :
+                                     "bg-linen-200 text-slate-600";
                       return (
                         <tr key={s.start_time} className="hover:bg-linen-100">
                           <td className="px-6 py-3 font-medium text-royal-900">{formatTime(s.start_time)}</td>
-                          <td className="px-4 py-3 text-right text-royal-900">{s.capacity}</td>
-                          <td className="px-4 py-3 text-right text-royal-900">{guests}</td>
-                          <td className="px-4 py-3 text-right text-royal-900">{checkedIn}</td>
-                          <td className="px-6 py-3 text-right">
-                            <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                              s.status === "closed" ? "bg-slate-200 text-slate-600" :
-                              guests >= s.capacity ? "bg-scarlet-600/10 text-scarlet-700" :
-                              "bg-green-100 text-green-800"
-                            }`}>
-                              {s.status === "closed" ? "Closed" : guests >= s.capacity ? "Full" : "Open"}
+                          <td className="px-4 py-3 text-right">
+                            <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${fillColor}`}>
+                              {pct}%
                             </span>
                           </td>
+                          <td className="px-4 py-3 text-right font-semibold text-royal-900">
+                            {guests} <span className="font-normal text-slate-400">/ {s.capacity}</span>
+                          </td>
+                          <td className="px-6 py-3 text-right text-royal-900">{checkedIn}</td>
                         </tr>
                       );
                     })}
