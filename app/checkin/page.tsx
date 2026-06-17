@@ -43,5 +43,7 @@ export default async function CheckInPage() {
     reservations: s.reservations.filter((r) => r.status === "confirmed"),
   }));
 
-  return <CheckInClient initialSlots={slots} today={today} serverError={!!error} />;
+  // error is null when the query succeeds but returns no rows — only flag a
+  // real DB error, not an empty result set (no tours today is normal).
+  return <CheckInClient initialSlots={slots} today={today} serverError={error !== null} />;
 }

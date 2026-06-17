@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Search, UserPlus, CheckCircle2, Clock, Users, X, Loader2, ChevronDown, ChevronUp } from "lucide-react";
-import { formatTime, formatDateLong, weekdayName } from "@/lib/booking";
+import { Search, UserPlus, CheckCircle2, Clock, Users, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { formatTime, formatDateLong } from "@/lib/booking";
 import type { SlotWithReservations } from "./page";
 
 const inputClass =
@@ -181,14 +181,12 @@ export default function CheckInClient({
         <div className="mb-6">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-gold-700">Volunteer Tool</p>
           <h1 className="mt-1 text-2xl font-semibold text-royal-900">Tour Check-In</h1>
-          <p className="mt-0.5 text-sm text-slate-500">
-            {weekdayName(today)}, {formatDateLong(today)}
-          </p>
+          <p className="mt-0.5 text-sm text-slate-500">{formatDateLong(today)}</p>
         </div>
 
         {serverError && (
           <p className="mb-6 rounded-xl bg-scarlet-600/10 px-4 py-3 text-sm text-scarlet-700">
-            Could not load today&apos;s slots. Check your connection and refresh.
+            Could not reach the database. Check your connection and refresh.
           </p>
         )}
 
@@ -248,6 +246,9 @@ export default function CheckInClient({
           <div className="rounded-2xl border border-linen-200 bg-linen-50 p-10 text-center">
             <Clock className="mx-auto text-gold-700" size={32} />
             <p className="mt-3 font-medium text-royal-900">No open tour slots today</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Tours run June 21–28. Use the search bar above to look up any reservation.
+            </p>
           </div>
         )}
 
