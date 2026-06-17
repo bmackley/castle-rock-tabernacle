@@ -112,7 +112,7 @@ export default async function MetricsPage() {
                   <th className="px-6 py-3">Date</th>
                   <th className="px-4 py-3 text-right">Filled</th>
                   <th className="px-4 py-3 text-right">Guests / Capacity</th>
-                  <th className="px-4 py-3 text-right">Open Slots</th>
+                  <th className="px-4 py-3 text-right">Available Tours</th>
                   <th className="px-6 py-3 text-right">Checked In</th>
                 </tr>
               </thead>
@@ -125,7 +125,10 @@ export default async function MetricsPage() {
                       : pct >= 50
                       ? { background: "#fef9c3", color: "#854d0e" }
                       : { background: "#e7e3db", color: "#475569" };
-                  const openSlots = Math.max(0, d.capacity - d.guests);
+                  const openSlots = slotsByDate.get(d.date)?.filter((s) => {
+                    const booked = s.reservations.filter((r) => r.status === "confirmed").reduce((n, r) => n + r.party_size, 0);
+                    return booked < s.capacity;
+                  }).length ?? 0;
                   return (
                     <tr key={d.date} className="hover:bg-linen-100">
                       <td className="px-6 py-4">
