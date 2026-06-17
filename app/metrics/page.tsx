@@ -1,3 +1,4 @@
+import type React from "react";
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDateLong, formatTime, weekdayName } from "@/lib/booking";
@@ -110,18 +111,21 @@ export default async function MetricsPage() {
                 <tr className="border-b border-linen-200 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                   <th className="px-6 py-3">Date</th>
                   <th className="px-4 py-3 text-right">Filled</th>
-                  <th className="px-4 py-3 text-right">Reservations / Slots</th>
                   <th className="px-4 py-3 text-right">Guests / Capacity</th>
+                  <th className="px-4 py-3 text-right">Open Slots</th>
                   <th className="px-6 py-3 text-right">Checked In</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-linen-200">
                 {days.map((d) => {
                   const pct = d.capacity > 0 ? Math.round((d.guests / d.capacity) * 100) : 0;
-                  const fillColor =
-                    pct >= 100 ? "bg-green-100 text-green-800" :
-                    pct >= 50  ? "bg-gold-500/20 text-gold-800" :
-                                 "bg-linen-200 text-slate-600";
+                  const badgeStyle: React.CSSProperties =
+                    pct >= 100
+                      ? { background: "#dcfce7", color: "#166534" }
+                      : pct >= 50
+                      ? { background: "#fef9c3", color: "#854d0e" }
+                      : { background: "#e7e3db", color: "#475569" };
+                  const openSlots = d.capacity > 0 ? d.slots - d.confirmed : 0;
                   return (
                     <tr key={d.date} className="hover:bg-linen-100">
                       <td className="px-6 py-4">
@@ -129,16 +133,14 @@ export default async function MetricsPage() {
                         <p className="text-slate-500">{formatDateLong(d.date)}</p>
                       </td>
                       <td className="px-4 py-4 text-right">
-                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${fillColor}`}>
+                        <span style={badgeStyle} className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold">
                           {pct}%
                         </span>
-                      </td>
-                      <td className="px-4 py-4 text-right text-royal-900">
-                        {d.confirmed} <span className="text-slate-400">/ {d.slots}</span>
                       </td>
                       <td className="px-4 py-4 text-right font-semibold text-royal-900">
                         {d.guests} <span className="font-normal text-slate-400">/ {d.capacity}</span>
                       </td>
+                      <td className="px-4 py-4 text-right text-royal-900">{openSlots}</td>
                       <td className="px-6 py-4 text-right text-royal-900">{d.checkedIn}</td>
                     </tr>
                   );
@@ -172,15 +174,17 @@ export default async function MetricsPage() {
                       const guests = confirmed.reduce((n, r) => n + r.party_size, 0);
                       const checkedIn = s.reservations.filter((r) => r.checked_in && r.status === "confirmed").length;
                       const pct = s.capacity > 0 ? Math.round((guests / s.capacity) * 100) : 0;
-                      const fillColor =
-                        pct >= 100 ? "bg-green-100 text-green-800" :
-                        pct >= 50  ? "bg-gold-500/20 text-gold-800" :
-                                     "bg-linen-200 text-slate-600";
+                      const badgeStyle: React.CSSProperties =
+                        pct >= 100
+                          ? { background: "#dcfce7", color: "#166534" }
+                          : pct >= 50
+                          ? { background: "#fef9c3", color: "#854d0e" }
+                          : { background: "#e7e3db", color: "#475569" };
                       return (
                         <tr key={s.start_time} className="hover:bg-linen-100">
                           <td className="px-6 py-3 font-medium text-royal-900">{formatTime(s.start_time)}</td>
                           <td className="px-4 py-3 text-right">
-                            <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${fillColor}`}>
+                            <span style={badgeStyle} className="inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold">
                               {pct}%
                             </span>
                           </td>
