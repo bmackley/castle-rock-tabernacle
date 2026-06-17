@@ -53,6 +53,7 @@ create table if not exists public.reservations (
   party_size        int         not null default 1 check (party_size between 1 and 20),
   status            text        not null default 'confirmed' check (status in ('confirmed', 'cancelled')),
   confirmation_code text        not null unique,
+  checked_in        boolean     not null default false,
   created_at        timestamptz not null default now()
 );
 
