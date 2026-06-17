@@ -25,7 +25,7 @@ export async function PATCH(request: NextRequest) {
 
 // POST — log a walk-in guest (creates a reservation on the given slot)
 export async function POST(request: NextRequest) {
-  let body: { slotId?: string; name?: string; partySize?: number; phone?: string };
+  let body: { slotId?: string; name?: string; partySize?: number; phone?: string; email?: string };
   try {
     body = await request.json();
   } catch {
@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
   const slotId = body.slotId?.trim();
   const name = body.name?.trim();
   const partySize = Number(body.partySize ?? 1);
+  const email = body.email?.trim() || "walkin@castlerocktabernacle.com";
 
   if (!slotId || !name) {
     return NextResponse.json({ error: "Name and slot are required." }, { status: 400 });
@@ -60,8 +61,8 @@ export async function POST(request: NextRequest) {
     .insert({
       slot_id: slotId,
       name,
-      email: "walkin@castlerocktabernacle.com",
-      phone: body.phone?.trim() ?? null,
+      email,
+      phone: body.phone?.trim() || null,
       party_size: partySize,
       confirmation_code: code,
       status: "confirmed",

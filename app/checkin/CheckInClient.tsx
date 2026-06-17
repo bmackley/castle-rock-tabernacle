@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Search, UserPlus, CheckCircle2, Clock, Users, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, UserPlus, CheckCircle2, Clock, Users, Loader2, ChevronDown, ChevronUp, X } from "lucide-react";
 import { formatTime, formatDateLong } from "@/lib/booking";
 import type { SlotWithReservations } from "./page";
 
@@ -18,6 +18,19 @@ interface SearchResult {
   tour_slots: { slot_date: string; start_time: string } | null;
 }
 
+// Denver-aware current time string "HH:MM:SS"
+function denverTime() {
+  return new Date().toLocaleTimeString("en-CA", { timeZone: "America/Denver", hour12: false });
+}
+
+// Returns the slot id that best matches "now": last started slot, or next upcoming.
+function currentSlotId(slotList: SlotWithReservations[]): string | null {
+  const now = denverTime();
+  const past = slotList.filter((s) => s.start_time <= now);
+  if (past.length > 0) return past[past.length - 1].id;
+  return slotList[0]?.id ?? null;
+}
+
 export default function CheckInClient({
   initialSlots,
   today,
@@ -32,30 +45,21 @@ export default function CheckInClient({
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [activeSlotId, setActiveSlotId] = useState<string | null>(
-    initialSlots[0]?.id ?? null
+    currentSlotId(initialSlots)
   );
+
+  // Walk-in form state
+  const [walkInOpen, setWalkInOpen] = useState(false);
   const [walkInSlotId, setWalkInSlotId] = useState<string | null>(null);
   const [walkInName, setWalkInName] = useState("");
   const [walkInParty, setWalkInParty] = useState(1);
+  const [walkInEmail, setWalkInEmail] = useState("");
   const [walkInPhone, setWalkInPhone] = useState("");
   const [walkInSubmitting, setWalkInSubmitting] = useState(false);
   const [walkInError, setWalkInError] = useState("");
+
   const [toastMsg, setToastMsg] = useState("");
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Denver-aware current time string "HH:MM:SS"
-  function denverTime() {
-    return new Date().toLocaleTimeString("en-CA", { timeZone: "America/Denver", hour12: false });
-  }
-
-  // Active slot: the one whose start_time <= now and the next one hasn't started yet,
-  // or the next upcoming one.
-  function currentSlotId(slotList: SlotWithReservations[]): string | null {
-    const now = denverTime();
-    const past = slotList.filter((s) => s.start_time <= now);
-    if (past.length > 0) return past[past.length - 1].id;
-    return slotList[0]?.id ?? null;
-  }
 
   // Refresh slot data every 60 seconds
   const refresh = useCallback(async () => {
@@ -100,9 +104,23 @@ export default function CheckInClient({
     setTimeout(() => setToastMsg(""), 3000);
   }
 
+  function openWalkIn() {
+    setWalkInSlotId(currentSlotId(slots));
+    setWalkInName("");
+    setWalkInParty(1);
+    setWalkInEmail("");
+    setWalkInPhone("");
+    setWalkInError("");
+    setWalkInOpen(true);
+  }
+
+  function closeWalkIn() {
+    setWalkInOpen(false);
+    setWalkInError("");
+  }
+
   async function toggleCheckIn(reservationId: string, current: boolean) {
     const next = !current;
-    // Optimistic update
     setSlots((prev) =>
       prev.map((s) => ({
         ...s,
@@ -122,7 +140,6 @@ export default function CheckInClient({
       });
       toast(next ? "Checked in" : "Check-in removed");
     } catch {
-      // Revert on failure
       setSlots((prev) =>
         prev.map((s) => ({
           ...s,
@@ -135,8 +152,9 @@ export default function CheckInClient({
     }
   }
 
-  async function submitWalkIn(slotId: string) {
+  async function submitWalkIn() {
     if (!walkInName.trim()) { setWalkInError("Name is required."); return; }
+    if (!walkInSlotId) { setWalkInError("Please select a time slot."); return; }
     setWalkInSubmitting(true);
     setWalkInError("");
     try {
@@ -144,19 +162,17 @@ export default function CheckInClient({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          slotId,
+          slotId: walkInSlotId,
           name: walkInName.trim(),
           partySize: walkInParty,
+          email: walkInEmail.trim() || undefined,
           phone: walkInPhone.trim() || undefined,
         }),
       });
       const body = await res.json();
       if (!res.ok) { setWalkInError(body.error ?? "Something went wrong."); return; }
       toast(`Walk-in logged: ${walkInName.trim()} (${body.code})`);
-      setWalkInName("");
-      setWalkInParty(1);
-      setWalkInPhone("");
-      setWalkInSlotId(null);
+      closeWalkIn();
       await refresh();
     } catch {
       setWalkInError("Something went wrong. Please try again.");
@@ -176,12 +192,122 @@ export default function CheckInClient({
         </div>
       )}
 
+      {/* Walk-in modal */}
+      {walkInOpen && (
+        <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/30 sm:items-center">
+          <div className="w-full max-w-md rounded-t-3xl bg-white p-6 shadow-xl sm:rounded-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-royal-900">Log a walk-in</h2>
+              <button onClick={closeWalkIn} className="text-slate-400 hover:text-slate-600">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="grid gap-3">
+              {/* Slot selector */}
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600">Tour time *</label>
+                <select
+                  value={walkInSlotId ?? ""}
+                  onChange={(e) => setWalkInSlotId(e.target.value || null)}
+                  className={inputClass}
+                >
+                  {slots.length === 0 && (
+                    <option value="">No slots today</option>
+                  )}
+                  {slots.map((s) => (
+                    <option key={s.id} value={s.id}>{formatTime(s.start_time)}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Name */}
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600">Name *</label>
+                <input
+                  value={walkInName}
+                  onChange={(e) => setWalkInName(e.target.value)}
+                  placeholder="Guest name"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Party size */}
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600">Party size</label>
+                <select
+                  value={walkInParty}
+                  onChange={(e) => setWalkInParty(Number(e.target.value))}
+                  className={inputClass}
+                >
+                  {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
+                    <option key={n} value={n}>{n} {n === 1 ? "guest" : "guests"}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Email (optional) */}
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600">Email (optional)</label>
+                <input
+                  type="email"
+                  value={walkInEmail}
+                  onChange={(e) => setWalkInEmail(e.target.value)}
+                  placeholder="guest@example.com"
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Phone (optional) */}
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600">Phone (optional)</label>
+                <input
+                  value={walkInPhone}
+                  onChange={(e) => setWalkInPhone(e.target.value)}
+                  placeholder="(555) 123-4567"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            {walkInError && (
+              <p className="mt-2 text-sm text-scarlet-600">{walkInError}</p>
+            )}
+
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={submitWalkIn}
+                disabled={walkInSubmitting}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-royal-900 px-4 py-2.5 text-sm font-semibold text-linen-50 hover:bg-royal-800 disabled:opacity-50"
+              >
+                {walkInSubmitting ? <Loader2 size={14} className="animate-spin" /> : <UserPlus size={14} />}
+                {walkInSubmitting ? "Logging…" : "Log walk-in"}
+              </button>
+              <button
+                onClick={closeWalkIn}
+                className="rounded-full px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-linen-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mx-auto max-w-2xl px-4 py-8">
         {/* Header */}
-        <div className="mb-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-gold-700">Volunteer Tool</p>
-          <h1 className="mt-1 text-2xl font-semibold text-royal-900">Tour Check-In</h1>
-          <p className="mt-0.5 text-sm text-slate-500">{formatDateLong(today)}</p>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-gold-700">Volunteer Tool</p>
+            <h1 className="mt-1 text-2xl font-semibold text-royal-900">Tour Check-In</h1>
+            <p className="mt-0.5 text-sm text-slate-500">{formatDateLong(today)}</p>
+          </div>
+          <button
+            onClick={openWalkIn}
+            className="mt-1 flex shrink-0 items-center gap-1.5 rounded-full bg-gold-500 px-4 py-2 text-sm font-semibold text-royal-900 hover:bg-gold-400"
+          >
+            <UserPlus size={15} /> Walk-in
+          </button>
         </div>
 
         {serverError && (
@@ -206,7 +332,6 @@ export default function CheckInClient({
             )}
           </div>
 
-          {/* Search results */}
           {query.length >= 2 && (
             <div className="mt-2 overflow-hidden rounded-xl border border-linen-200 bg-white shadow-sm">
               {searchResults.length === 0 && !searching ? (
@@ -277,7 +402,6 @@ export default function CheckInClient({
               })}
             </div>
 
-            {/* Active slot detail */}
             {activeSlot && (
               <div className="overflow-hidden rounded-2xl border border-linen-200 bg-linen-50">
                 {/* Slot header */}
@@ -289,76 +413,10 @@ export default function CheckInClient({
                       {activeSlot.reservations.reduce((n, r) => n + r.party_size, 0)} guests checked in
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-linen-200/70">
-                      {activeSlot.capacity - activeSlot.reservations.reduce((n, r) => n + r.party_size, 0)} spots remaining
-                    </span>
-                    <button
-                      onClick={() => { setWalkInSlotId(walkInSlotId === activeSlot.id ? null : activeSlot.id); setWalkInError(""); }}
-                      className="flex items-center gap-1.5 rounded-full bg-gold-500 px-3 py-1.5 text-xs font-semibold text-royal-900 hover:bg-gold-400"
-                    >
-                      <UserPlus size={13} /> Walk-in
-                    </button>
-                  </div>
+                  <span className="text-xs text-linen-200/70">
+                    {activeSlot.capacity - activeSlot.reservations.reduce((n, r) => n + r.party_size, 0)} spots remaining
+                  </span>
                 </div>
-
-                {/* Walk-in form */}
-                {walkInSlotId === activeSlot.id && (
-                  <div className="border-b border-linen-200 bg-white/60 px-6 py-4">
-                    <p className="mb-3 text-sm font-semibold text-royal-900">Log a walk-in</p>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div>
-                        <label className="mb-1 block text-xs font-medium text-slate-600">Name *</label>
-                        <input
-                          value={walkInName}
-                          onChange={(e) => setWalkInName(e.target.value)}
-                          placeholder="Guest name"
-                          className={inputClass}
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium text-slate-600">Party size</label>
-                        <select
-                          value={walkInParty}
-                          onChange={(e) => setWalkInParty(Number(e.target.value))}
-                          className={inputClass}
-                        >
-                          {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
-                            <option key={n} value={n}>{n} {n === 1 ? "guest" : "guests"}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="mb-1 block text-xs font-medium text-slate-600">Phone (optional)</label>
-                        <input
-                          value={walkInPhone}
-                          onChange={(e) => setWalkInPhone(e.target.value)}
-                          placeholder="(555) 123-4567"
-                          className={inputClass}
-                        />
-                      </div>
-                    </div>
-                    {walkInError && (
-                      <p className="mt-2 text-sm text-scarlet-600">{walkInError}</p>
-                    )}
-                    <div className="mt-3 flex gap-2">
-                      <button
-                        onClick={() => submitWalkIn(activeSlot.id)}
-                        disabled={walkInSubmitting}
-                        className="flex items-center gap-1.5 rounded-full bg-royal-900 px-4 py-2 text-sm font-semibold text-linen-50 hover:bg-royal-800 disabled:opacity-50"
-                      >
-                        {walkInSubmitting ? <Loader2 size={14} className="animate-spin" /> : <UserPlus size={14} />}
-                        {walkInSubmitting ? "Logging…" : "Log walk-in"}
-                      </button>
-                      <button
-                        onClick={() => { setWalkInSlotId(null); setWalkInError(""); }}
-                        className="rounded-full px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-linen-200"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
 
                 {/* Reservation list */}
                 {activeSlot.reservations.length === 0 ? (
@@ -398,7 +456,6 @@ function ReservationRow({
   return (
     <li className={`transition-colors ${r.checked_in ? "bg-green-50/60" : ""}`}>
       <div className="flex items-center gap-4 px-6 py-4">
-        {/* Check-in button */}
         <button
           onClick={handle}
           disabled={pending}
@@ -412,7 +469,6 @@ function ReservationRow({
           <CheckCircle2 size={20} />
         </button>
 
-        {/* Name + party */}
         <div className="min-w-0 flex-1">
           <p className={`truncate font-medium ${r.checked_in ? "text-green-900" : "text-royal-900"}`}>
             {r.name}
@@ -422,7 +478,6 @@ function ReservationRow({
           </p>
         </div>
 
-        {/* Expand for contact info */}
         <button
           onClick={() => setExpanded((e) => !e)}
           className="shrink-0 text-slate-400 hover:text-slate-600"
