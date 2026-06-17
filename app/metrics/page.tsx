@@ -125,7 +125,7 @@ export default async function MetricsPage() {
                       : pct >= 50
                       ? { background: "#fef9c3", color: "#854d0e" }
                       : { background: "#e7e3db", color: "#475569" };
-                  const openSlots = d.capacity > 0 ? d.slots - d.confirmed : 0;
+                  const openSlots = Math.max(0, d.capacity - d.guests);
                   return (
                     <tr key={d.date} className="hover:bg-linen-100">
                       <td className="px-6 py-4">
