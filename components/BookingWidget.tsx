@@ -218,13 +218,17 @@ export default function BookingWidget({ initialSlots }: { initialSlots: Availabl
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gold-500 text-xs font-bold text-royal-900">2</span>
               Choose a time on {formatDateLong(selectedDate)}
             </label>
-            <div className="relative max-w-sm">
+            <div className="relative">
               <Clock size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gold-700" />
               <select
                 id="tourTime"
                 value={selectedSlot?.id ?? ""}
                 onChange={(e) => setSelectedSlot(slotsForDate.find((s) => s.id === e.target.value) ?? null)}
-                className={`${inputClass} appearance-none pl-11`}
+                className={`w-full appearance-none rounded-xl border-2 bg-white py-4 pl-11 pr-10 text-sm font-medium outline-none transition-colors ${
+                  selectedSlot
+                    ? "border-linen-300 text-royal-900"
+                    : "border-gold-500 text-slate-500 ring-2 ring-gold-400/30"
+                }`}
               >
                 <option value="" disabled>
                   Select a tour time…
@@ -235,6 +239,10 @@ export default function BookingWidget({ initialSlots }: { initialSlots: Availabl
                   </option>
                 ))}
               </select>
+              {/* Chevron */}
+              <svg className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gold-700" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </div>
           </div>
         )}
