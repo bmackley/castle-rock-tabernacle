@@ -11,6 +11,7 @@ interface Row {
   phone: string | null;
   party_size: number;
   status: "confirmed" | "cancelled";
+  checked_in: boolean;
   created_at: string;
   tour_slots: { slot_date: string; start_time: string; end_time: string } | null;
 }
@@ -19,8 +20,8 @@ export default async function AdminReservationsPage() {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("reservations")
-    .select("id, confirmation_code, name, email, phone, party_size, status, created_at, tour_slots(slot_date, start_time, end_time)")
-    .order("created_at", { ascending: false });
+    .select("id, confirmation_code, name, email, phone, party_size, status, checked_in, created_at, tour_slots(slot_date, start_time, end_time)")
+    .order("created_at", { ascending: true });
 
   const rows = (data ?? []) as unknown as Row[];
   const reservations: AdminReservation[] = rows.map((r) => ({
@@ -31,6 +32,7 @@ export default async function AdminReservationsPage() {
     phone: r.phone,
     party_size: r.party_size,
     status: r.status,
+    checked_in: r.checked_in,
     created_at: r.created_at,
     slot_date: r.tour_slots?.slot_date ?? null,
     start_time: r.tour_slots?.start_time ?? null,
@@ -41,7 +43,7 @@ export default async function AdminReservationsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-royal-900">Reservations</h1>
-        <p className="mt-1 text-sm text-slate-600">Everyone who has reserved a tour. Search, filter, cancel, or export.</p>
+        <p className="mt-1 text-sm text-slate-600">All registrations. Search, filter by date, reschedule, cancel, or export.</p>
       </div>
       <ReservationsTable reservations={reservations} />
     </div>
