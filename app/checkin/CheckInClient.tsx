@@ -491,7 +491,17 @@ function ReservationRow({
         <div className="border-t border-linen-100 bg-white/50 px-6 py-3 text-xs text-slate-500">
           <p>{r.email === "walkin@castlerocktabernacle.com" ? <em>Walk-in</em> : r.email}</p>
           {r.phone && <p>{r.phone}</p>}
-          <p className="font-mono">{r.confirmation_code}</p>
+          <div className="mt-1.5 flex items-center justify-between gap-4">
+            <p className="font-mono">{r.confirmation_code}</p>
+            <a
+              href={`/reservation/${r.confirmation_code}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-sans font-semibold text-gold-700 hover:text-gold-600 hover:underline"
+            >
+              Manage / Cancel →
+            </a>
+          </div>
         </div>
       )}
     </li>
