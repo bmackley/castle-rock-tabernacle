@@ -339,25 +339,35 @@ export default function CheckInClient({
               ) : (
                 <ul className="divide-y divide-linen-100">
                   {searchResults.map((r) => (
-                    <li key={r.id} className="flex items-center justify-between gap-4 px-4 py-3">
-                      <div className="min-w-0">
-                        <p className="truncate font-medium text-royal-900">{r.name}</p>
-                        <p className="text-xs text-slate-500">
-                          {r.party_size} {r.party_size === 1 ? "guest" : "guests"} ·{" "}
-                          {r.tour_slots ? `${formatDateLong(r.tour_slots.slot_date)} at ${formatTime(r.tour_slots.start_time)}` : "—"} ·{" "}
-                          {r.confirmation_code}
-                        </p>
+                    <li key={r.id} className="px-4 py-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="truncate font-medium text-royal-900">{r.name}</p>
+                          <p className="text-xs text-slate-500">
+                            {r.party_size} {r.party_size === 1 ? "guest" : "guests"} ·{" "}
+                            {r.tour_slots ? `${formatDateLong(r.tour_slots.slot_date)} at ${formatTime(r.tour_slots.start_time)}` : "—"} ·{" "}
+                            {r.confirmation_code}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => toggleCheckIn(r.id, r.checked_in)}
+                          className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                            r.checked_in
+                              ? "bg-green-100 text-green-800 hover:bg-green-200"
+                              : "bg-linen-200 text-slate-700 hover:bg-gold-500/20"
+                          }`}
+                        >
+                          {r.checked_in ? "Checked in" : "Check in"}
+                        </button>
                       </div>
-                      <button
-                        onClick={() => toggleCheckIn(r.id, r.checked_in)}
-                        className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                          r.checked_in
-                            ? "bg-green-100 text-green-800 hover:bg-green-200"
-                            : "bg-linen-200 text-slate-700 hover:bg-gold-500/20"
-                        }`}
+                      <a
+                        href={`/reservation/${r.confirmation_code}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 inline-block text-xs font-semibold text-gold-700 hover:text-gold-600 hover:underline"
                       >
-                        {r.checked_in ? "Checked in" : "Check in"}
-                      </button>
+                        Manage / Cancel →
+                      </a>
                     </li>
                   ))}
                 </ul>
