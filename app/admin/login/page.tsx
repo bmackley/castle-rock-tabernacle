@@ -19,20 +19,25 @@ export default function AdminLoginPage() {
     setError("");
     const data = new FormData(e.currentTarget);
 
-    const res = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password: data.get("password") }),
-    });
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: data.get("password") }),
+      });
 
-    if (!res.ok) {
-      setError("Incorrect password.");
+      if (!res.ok) {
+        setError("Incorrect password.");
+        return;
+      }
+
+      router.push("/admin");
+      router.refresh();
+    } catch {
+      setError("Could not reach server. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    router.push("/admin");
-    router.refresh();
   }
 
   return (
