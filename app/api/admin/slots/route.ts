@@ -1,13 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getAdminUser } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateSlots, type GenerateSlotsInput } from "@/lib/booking";
 
 // POST — bulk-generate slots from a recurring rule.
 export async function POST(request: NextRequest) {
-  const admin = await getAdminUser();
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   let input: GenerateSlotsInput;
   try {
     input = await request.json();
@@ -70,9 +66,6 @@ export async function POST(request: NextRequest) {
 
 // PATCH — open/close a single slot.
 export async function PATCH(request: NextRequest) {
-  const admin = await getAdminUser();
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const { id, status } = await request.json().catch(() => ({}));
   if (!id || (status !== "open" && status !== "closed")) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
@@ -89,9 +82,6 @@ export async function PATCH(request: NextRequest) {
 
 // DELETE — remove a slot (refused if it has active reservations).
 export async function DELETE(request: NextRequest) {
-  const admin = await getAdminUser();
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const { id } = await request.json().catch(() => ({}));
   if (!id) return NextResponse.json({ error: "Invalid request." }, { status: 400 });
 

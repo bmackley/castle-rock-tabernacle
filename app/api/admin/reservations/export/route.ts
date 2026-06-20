@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { getAdminUser } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 interface ExportRow {
@@ -20,9 +19,6 @@ function csvCell(value: string | number | null): string {
 
 // GET — download all reservations as a CSV.
 export async function GET() {
-  const admin = await getAdminUser();
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("reservations")

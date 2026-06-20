@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, CalendarClock, Users, LogOut, ExternalLink } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { LayoutDashboard, CalendarClock, Users, ExternalLink } from "lucide-react";
 import { site } from "@/lib/site";
 
 const links = [
@@ -13,13 +13,6 @@ const links = [
 
 export default function AdminNav({ email: _ }: { email: string | null }) {
   const pathname = usePathname();
-  const router = useRouter();
-
-  async function signOut() {
-    await fetch("/api/admin/logout", { method: "POST" });
-    router.push("/admin/login");
-    router.refresh();
-  }
 
   return (
     <header className="border-b border-royal-800 bg-royal-900 text-linen-50">
@@ -45,14 +38,9 @@ export default function AdminNav({ email: _ }: { email: string | null }) {
             })}
           </nav>
         </div>
-        <div className="flex items-center gap-3 text-sm">
-          <Link href="/" target="_blank" className="hidden items-center gap-1 text-slate-300 hover:text-linen-50 sm:flex">
-            View site <ExternalLink size={13} />
-          </Link>
-          <button onClick={signOut} className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-slate-300 hover:text-linen-50">
-            <LogOut size={15} /> Sign out
-          </button>
-        </div>
+        <Link href="/" target="_blank" className="hidden items-center gap-1 text-sm text-slate-300 hover:text-linen-50 sm:flex">
+          View site <ExternalLink size={13} />
+        </Link>
       </div>
     </header>
   );

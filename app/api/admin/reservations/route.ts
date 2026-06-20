@@ -1,12 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getAdminUser } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 // PATCH — cancel or restore a reservation.
 export async function PATCH(request: NextRequest) {
-  const admin = await getAdminUser();
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const { id, status } = await request.json().catch(() => ({}));
   if (!id || (status !== "confirmed" && status !== "cancelled")) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
@@ -23,9 +19,6 @@ export async function PATCH(request: NextRequest) {
 
 // PUT — move a reservation to a different slot.
 export async function PUT(request: NextRequest) {
-  const admin = await getAdminUser();
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const { id, slot_id } = await request.json().catch(() => ({}));
   if (!id || !slot_id) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
@@ -67,13 +60,7 @@ export async function PUT(request: NextRequest) {
 }
 
 // GET — list all open slots for the reassignment dropdown.
-export async function GET(request: NextRequest) {
-  const admin = await getAdminUser();
-  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  // Suppress unused param warning — required for Next.js route handler signature.
-  void request;
-
+export async function GET() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("tour_slots")
