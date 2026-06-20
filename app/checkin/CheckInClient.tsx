@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Search, UserPlus, CheckCircle2, Clock, Users, Loader2, ChevronDown, ChevronUp, X } from "lucide-react";
+import Link from "next/link";
+import { Search, UserPlus, CheckCircle2, Clock, Users, Loader2, ChevronDown, ChevronUp, X, HelpCircle } from "lucide-react";
 import { formatTime, formatDateLong } from "@/lib/booking";
 import type { SlotWithReservations } from "./page";
 
@@ -302,12 +303,21 @@ export default function CheckInClient({
             <h1 className="mt-1 text-2xl font-semibold text-royal-900">Tour Check-In</h1>
             <p className="mt-0.5 text-sm text-slate-500">{formatDateLong(today)}</p>
           </div>
-          <button
-            onClick={openWalkIn}
-            className="mt-1 flex shrink-0 items-center gap-1.5 rounded-full bg-gold-500 px-4 py-2 text-sm font-semibold text-royal-900 hover:bg-gold-400"
-          >
-            <UserPlus size={15} /> Walk-in
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link
+              href="/checkin/sop"
+              target="_blank"
+              className="mt-1 flex items-center gap-1.5 rounded-full border border-linen-300 bg-linen-50 px-3 py-2 text-sm font-medium text-slate-600 hover:border-gold-500 hover:text-royal-900"
+            >
+              <HelpCircle size={15} /> Help
+            </Link>
+            <button
+              onClick={openWalkIn}
+              className="mt-1 flex items-center gap-1.5 rounded-full bg-gold-500 px-4 py-2 text-sm font-semibold text-royal-900 hover:bg-gold-400"
+            >
+              <UserPlus size={15} /> Walk-in
+            </button>
+          </div>
         </div>
 
         {serverError && (
