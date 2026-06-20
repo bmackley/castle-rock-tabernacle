@@ -27,7 +27,8 @@ export default function AdminLoginPage() {
       });
 
       if (!res.ok) {
-        setError("Incorrect password.");
+        const body = await res.json().catch(() => ({}));
+        setError(body.error ?? "Incorrect password.");
         return;
       }
 
