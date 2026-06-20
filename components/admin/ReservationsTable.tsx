@@ -136,6 +136,17 @@ export default function ReservationsTable({ reservations }: { reservations: Admi
     return true;
   });
 
+  // Per-tab guest counts for the badge (confirmed only)
+  const countByDate = useMemo(() => {
+    const map: Record<string, number> = { all: 0 };
+    for (const r of reservations) {
+      if (r.status !== "confirmed") continue;
+      map.all = (map.all ?? 0) + r.party_size;
+      if (r.slot_date) map[r.slot_date] = (map[r.slot_date] ?? 0) + r.party_size;
+    }
+    return map;
+  }, [reservations]);
+
   async function cancel(r: AdminReservation) {
     if (!confirm(`Cancel ${r.name}'s reservation (${r.confirmation_code})? This frees their spot.`)) return;
     setBusyId(r.id);
@@ -179,7 +190,31 @@ export default function ReservationsTable({ reservations }: { reservations: Admi
 
   return (
     <div className="space-y-4">
-      {/* Filters */}
+      {/* Date tabs */}
+      <div className="flex flex-wrap gap-2">
+        {[{ label: "All days", value: "all" }, ...dates.map((d) => ({ label: formatDateShort(d), value: d }))].map((tab) => {
+          const active = dateFilter === tab.value;
+          const count = countByDate[tab.value] ?? 0;
+          return (
+            <button
+              key={tab.value}
+              onClick={() => setDateFilter(tab.value)}
+              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                active
+                  ? "border-royal-900 bg-royal-900 text-linen-50"
+                  : "border-linen-300 bg-linen-50 text-slate-600 hover:border-gold-500 hover:text-royal-900"
+              }`}
+            >
+              {tab.label}
+              <span className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${active ? "bg-white/20 text-linen-50" : "bg-linen-200 text-slate-500"}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Search + status filter + export */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
@@ -191,16 +226,6 @@ export default function ReservationsTable({ reservations }: { reservations: Admi
               className="rounded-lg border border-linen-300 bg-linen-50 py-2 pl-9 pr-3 text-sm outline-none focus:border-gold-500"
             />
           </div>
-          <select
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="rounded-lg border border-linen-300 bg-linen-50 px-3 py-2 text-sm outline-none focus:border-gold-500"
-          >
-            <option value="all">All dates</option>
-            {dates.map((d) => (
-              <option key={d} value={d}>{formatDateShort(d)}</option>
-            ))}
-          </select>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
