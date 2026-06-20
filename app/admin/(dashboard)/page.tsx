@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CalendarClock, Users, Ticket, ArrowRight } from "lucide-react";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { formatDateLong, formatTimeRange } from "@/lib/booking";
+import { formatDateLong, formatTime } from "@/lib/booking";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +10,7 @@ interface RecentRow {
   name: string;
   party_size: number;
   created_at: string;
-  tour_slots: { slot_date: string; start_time: string; end_time: string } | null;
+  tour_slots: { slot_date: string; start_time: string } | null;
 }
 
 export default async function AdminOverviewPage() {
@@ -26,7 +26,7 @@ export default async function AdminOverviewPage() {
     supabase.from("reservations").select("party_size").eq("status", "confirmed"),
     supabase
       .from("reservations")
-      .select("confirmation_code, name, party_size, created_at, tour_slots(slot_date, start_time, end_time)")
+      .select("confirmation_code, name, party_size, created_at, tour_slots(slot_date, start_time)")
       .eq("status", "confirmed")
       .order("created_at", { ascending: false })
       .limit(6),
@@ -80,7 +80,7 @@ export default async function AdminOverviewPage() {
                 <div>
                   <p className="font-medium text-royal-900">{r.name} <span className="text-slate-500">· {r.party_size} {r.party_size === 1 ? "guest" : "guests"}</span></p>
                   <p className="text-slate-500">
-                    {r.tour_slots ? `${formatDateLong(r.tour_slots.slot_date)} · ${formatTimeRange(r.tour_slots.start_time, r.tour_slots.end_time)}` : "—"}
+                    {r.tour_slots ? `${formatDateLong(r.tour_slots.slot_date)} · ${formatTime(r.tour_slots.start_time)}` : "—"}
                   </p>
                 </div>
                 <span className="font-mono text-xs text-slate-500">{r.confirmation_code}</span>

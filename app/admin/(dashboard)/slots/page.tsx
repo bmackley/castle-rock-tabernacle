@@ -1,5 +1,4 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import SlotGenerator from "@/components/admin/SlotGenerator";
 import SlotsList, { type AdminSlot } from "@/components/admin/SlotsList";
 import type { TourSlot } from "@/lib/types";
 
@@ -38,15 +37,9 @@ export default async function AdminSlotsPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold text-royal-900">Tour Slots</h1>
-        <p className="mt-1 text-sm text-slate-600">Create and manage the tour times visitors can reserve.</p>
+        <p className="mt-1 text-sm text-slate-600">Upcoming tour times and their availability.</p>
       </div>
-
-      <SlotGenerator />
-
-      <div>
-        <h2 className="mb-4 text-lg font-semibold text-royal-900">Upcoming slots</h2>
-        <SlotsList slots={slots} />
-      </div>
+      <SlotsList slots={slots} />
     </div>
   );
 }
