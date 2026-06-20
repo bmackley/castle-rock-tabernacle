@@ -466,11 +466,28 @@ function ReservationRow({
 }) {
   const [expanded, setExpanded] = useState(false);
   const [pending, setPending] = useState(false);
+  const [partySize, setPartySize] = useState(r.party_size);
+  const [savingParty, setSavingParty] = useState(false);
 
   async function handle() {
     setPending(true);
     await onToggle(r.id, r.checked_in);
     setPending(false);
+  }
+
+  async function updatePartySize(next: number) {
+    if (next < 1 || next > 20) return;
+    setPartySize(next);
+    setSavingParty(true);
+    try {
+      await fetch("/api/checkin", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: r.id, party_size: next }),
+      });
+    } finally {
+      setSavingParty(false);
+    }
   }
 
   return (
@@ -493,9 +510,25 @@ function ReservationRow({
           <p className={`truncate font-medium ${r.checked_in ? "text-green-900" : "text-royal-900"}`}>
             {r.name}
           </p>
-          <p className="flex items-center gap-1 text-xs text-slate-500">
-            <Users size={11} /> {r.party_size} {r.party_size === 1 ? "guest" : "guests"}
-          </p>
+          {/* Party size stepper */}
+          <div className="mt-1 flex items-center gap-2">
+            <button
+              onClick={() => updatePartySize(partySize - 1)}
+              disabled={partySize <= 1 || savingParty}
+              className="flex h-5 w-5 items-center justify-center rounded-full border border-linen-300 text-xs text-slate-500 hover:border-gold-500 hover:text-royal-900 disabled:opacity-30"
+              aria-label="Decrease party size"
+            >−</button>
+            <span className={`flex items-center gap-1 text-xs ${savingParty ? "text-slate-400" : "text-slate-500"}`}>
+              <Users size={11} />
+              {partySize} {partySize === 1 ? "guest" : "guests"}
+            </span>
+            <button
+              onClick={() => updatePartySize(partySize + 1)}
+              disabled={partySize >= 20 || savingParty}
+              className="flex h-5 w-5 items-center justify-center rounded-full border border-linen-300 text-xs text-slate-500 hover:border-gold-500 hover:text-royal-900 disabled:opacity-30"
+              aria-label="Increase party size"
+            >+</button>
+          </div>
         </div>
 
         <button

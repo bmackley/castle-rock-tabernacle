@@ -1,22 +1,31 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-// PATCH — toggle checked_in on a reservation
+// PATCH — update checked_in and/or party_size on a reservation
 export async function PATCH(request: NextRequest) {
-  let body: { id?: string; checked_in?: boolean };
+  let body: { id?: string; checked_in?: boolean; party_size?: number };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
-  if (!body.id || typeof body.checked_in !== "boolean") {
-    return NextResponse.json({ error: "Missing id or checked_in." }, { status: 400 });
+  if (!body.id) {
+    return NextResponse.json({ error: "Missing id." }, { status: 400 });
+  }
+
+  const update: Record<string, unknown> = {};
+  if (typeof body.checked_in === "boolean") update.checked_in = body.checked_in;
+  if (typeof body.party_size === "number" && body.party_size >= 1 && body.party_size <= 20) {
+    update.party_size = body.party_size;
+  }
+  if (Object.keys(update).length === 0) {
+    return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
   }
 
   const supabase = createAdminClient();
   const { error } = await supabase
     .from("reservations")
-    .update({ checked_in: body.checked_in })
+    .update(update)
     .eq("id", body.id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
