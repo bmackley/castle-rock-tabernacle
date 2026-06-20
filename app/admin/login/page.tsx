@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Loader2, AlertCircle } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/Button";
 import { site } from "@/lib/site";
 
 const inputClass =
@@ -21,17 +19,18 @@ export default function AdminLoginPage() {
     setError("");
     const data = new FormData(e.currentTarget);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: String(data.get("email")),
-      password: String(data.get("password")),
+    const res = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: data.get("password") }),
     });
 
-    if (error) {
-      setError(error.message);
+    if (!res.ok) {
+      setError("Incorrect password.");
       setLoading(false);
       return;
     }
+
     router.push("/admin");
     router.refresh();
   }
@@ -45,15 +44,18 @@ export default function AdminLoginPage() {
         </div>
         <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl bg-linen-50 p-6 shadow-xl sm:p-8">
           <p className="flex items-center gap-2 text-sm font-semibold text-royal-900">
-            <Lock size={16} className="text-gold-700" /> Sign in
+            <Lock size={16} className="text-gold-700" /> Enter password
           </p>
           <div>
-            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-royal-800">Email</label>
-            <input id="email" name="email" type="email" required autoComplete="email" className={inputClass} />
-          </div>
-          <div>
-            <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-royal-800">Password</label>
-            <input id="password" name="password" type="password" required autoComplete="current-password" className={inputClass} />
+            <input
+              name="password"
+              type="password"
+              required
+              autoComplete="current-password"
+              autoFocus
+              placeholder="Password"
+              className={inputClass}
+            />
           </div>
 
           {error && (
@@ -62,10 +64,14 @@ export default function AdminLoginPage() {
             </p>
           )}
 
-          <Button type="submit" variant="primary" disabled={loading} className="w-full">
-            {loading ? <Loader2 className="animate-spin" size={16} /> : null}
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-royal-900 py-3 text-sm font-semibold text-linen-50 hover:bg-royal-800 disabled:opacity-60"
+          >
+            {loading && <Loader2 size={15} className="animate-spin" />}
             {loading ? "Signing in…" : "Sign in"}
-          </Button>
+          </button>
         </form>
       </div>
     </div>

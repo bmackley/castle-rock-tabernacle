@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, CalendarClock, Users, LogOut, ExternalLink } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { site } from "@/lib/site";
 
 const links = [
@@ -12,13 +11,12 @@ const links = [
   { href: "/admin/reservations", label: "Reservations", icon: Users },
 ];
 
-export default function AdminNav({ email }: { email: string | null }) {
+export default function AdminNav({ email: _ }: { email: string | null }) {
   const pathname = usePathname();
   const router = useRouter();
 
   async function signOut() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin/login");
     router.refresh();
   }
@@ -51,7 +49,6 @@ export default function AdminNav({ email }: { email: string | null }) {
           <Link href="/" target="_blank" className="hidden items-center gap-1 text-slate-300 hover:text-linen-50 sm:flex">
             View site <ExternalLink size={13} />
           </Link>
-          {email && <span className="hidden text-slate-400 md:inline">{email}</span>}
           <button onClick={signOut} className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-slate-300 hover:text-linen-50">
             <LogOut size={15} /> Sign out
           </button>
