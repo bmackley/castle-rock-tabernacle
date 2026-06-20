@@ -28,22 +28,40 @@ export default async function CheckInPage() {
   const supabase = createAdminClient();
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Denver" });
 
-  const { data, error } = await supabase
-    .from("tour_slots")
-    .select(`
-      id, slot_date, start_time, end_time, capacity, status,
-      reservations(id, name, email, phone, party_size, confirmation_code, checked_in, status)
-    `)
-    .eq("slot_date", today)
-    .eq("status", "open")
-    .order("start_time", { ascending: true });
+  const [slotsRes, datesRes] = await Promise.all([
+    supabase
+      .from("tour_slots")
+      .select(`
+        id, slot_date, start_time, end_time, capacity, status,
+        reservations(id, name, email, phone, party_size, confirmation_code, checked_in, status)
+      `)
+      .eq("slot_date", today)
+      .eq("status", "open")
+      .order("start_time", { ascending: true }),
 
-  const slots = ((data ?? []) as unknown as SlotWithReservations[]).map((s) => ({
+    // Fetch all distinct tour dates so the client can render day tabs
+    supabase
+      .from("tour_slots")
+      .select("slot_date")
+      .eq("status", "open")
+      .order("slot_date", { ascending: true }),
+  ]);
+
+  const slots = ((slotsRes.data ?? []) as unknown as SlotWithReservations[]).map((s) => ({
     ...s,
     reservations: s.reservations.filter((r) => r.status === "confirmed"),
   }));
 
-  // error is null when the query succeeds but returns no rows — only flag a
-  // real DB error, not an empty result set (no tours today is normal).
-  return <CheckInClient initialSlots={slots} today={today} serverError={error !== null} />;
+  const allDates = Array.from(
+    new Set((datesRes.data ?? []).map((r) => r.slot_date as string))
+  ).sort();
+
+  return (
+    <CheckInClient
+      initialSlots={slots}
+      today={today}
+      allDates={allDates}
+      serverError={slotsRes.error !== null}
+    />
+  );
 }

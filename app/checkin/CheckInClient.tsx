@@ -35,13 +35,17 @@ function currentSlotId(slotList: SlotWithReservations[]): string | null {
 export default function CheckInClient({
   initialSlots,
   today,
+  allDates,
   serverError,
 }: {
   initialSlots: SlotWithReservations[];
   today: string;
+  allDates: string[];
   serverError: boolean;
 }) {
+  const [activeDate, setActiveDate] = useState(today);
   const [slots, setSlots] = useState(initialSlots);
+  const [loadingDate, setLoadingDate] = useState(false);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -62,15 +66,28 @@ export default function CheckInClient({
   const [toastMsg, setToastMsg] = useState("");
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Refresh slot data every 60 seconds
+  // Refresh slot data for the active date
   const refresh = useCallback(async () => {
     try {
-      const res = await fetch(`/api/checkin/slots?date=${today}`);
+      const res = await fetch(`/api/checkin/slots?date=${activeDate}`);
       if (!res.ok) return;
       const { slots: fresh } = await res.json();
       setSlots(fresh);
     } catch { /* silently ignore */ }
-  }, [today]);
+  }, [activeDate]);
+
+  async function switchDate(date: string) {
+    setActiveDate(date);
+    setLoadingDate(true);
+    try {
+      const res = await fetch(`/api/checkin/slots?date=${date}`);
+      if (!res.ok) return;
+      const { slots: fresh } = await res.json();
+      setSlots(fresh);
+      setActiveSlotId(currentSlotId(fresh));
+    } catch { /* ignore */ }
+    finally { setLoadingDate(false); }
+  }
 
   useEffect(() => {
     const id = setInterval(refresh, 60_000);
@@ -297,11 +314,11 @@ export default function CheckInClient({
 
       <div className="mx-auto max-w-2xl px-4 py-8">
         {/* Header */}
-        <div className="mb-6 flex items-start justify-between gap-4">
+        <div className="mb-4 flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-gold-700">Volunteer Tool</p>
             <h1 className="mt-1 text-2xl font-semibold text-royal-900">Tour Check-In</h1>
-            <p className="mt-0.5 text-sm text-slate-500">{formatDateLong(today)}</p>
+            <p className="mt-0.5 text-sm text-slate-500">{formatDateLong(activeDate)}</p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <Link
@@ -319,6 +336,30 @@ export default function CheckInClient({
             </button>
           </div>
         </div>
+
+        {/* Date tabs */}
+        {allDates.length > 0 && (
+          <div className="mb-6 flex flex-wrap gap-2">
+            {allDates.map((d) => {
+              const isActive = d === activeDate;
+              const isToday = d === today;
+              return (
+                <button
+                  key={d}
+                  onClick={() => switchDate(d)}
+                  className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                    isActive
+                      ? "border-royal-900 bg-royal-900 text-linen-50"
+                      : "border-linen-300 bg-linen-50 text-slate-600 hover:border-gold-500 hover:text-royal-900"
+                  }`}
+                >
+                  {new Date(d + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                  {isToday && <span className={`ml-1.5 text-xs ${isActive ? "text-gold-300" : "text-gold-600"}`}>Today</span>}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {serverError && (
           <p className="mb-6 rounded-xl bg-scarlet-600/10 px-4 py-3 text-sm text-scarlet-700">
@@ -349,36 +390,11 @@ export default function CheckInClient({
               ) : (
                 <ul className="divide-y divide-linen-100">
                   {searchResults.map((r) => (
-                    <li key={r.id} className="px-4 py-3">
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="min-w-0">
-                          <p className="truncate font-medium text-royal-900">{r.name}</p>
-                          <p className="text-xs text-slate-500">
-                            {r.party_size} {r.party_size === 1 ? "guest" : "guests"} ·{" "}
-                            {r.tour_slots ? `${formatDateLong(r.tour_slots.slot_date)} at ${formatTime(r.tour_slots.start_time)}` : "—"} ·{" "}
-                            {r.confirmation_code}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => toggleCheckIn(r.id, r.checked_in)}
-                          className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                            r.checked_in
-                              ? "bg-green-100 text-green-800 hover:bg-green-200"
-                              : "bg-linen-200 text-slate-700 hover:bg-gold-500/20"
-                          }`}
-                        >
-                          {r.checked_in ? "Checked in" : "Check in"}
-                        </button>
-                      </div>
-                      <a
-                        href={`/reservation/${r.confirmation_code}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-1 inline-block text-xs font-semibold text-gold-700 hover:text-gold-600 hover:underline"
-                      >
-                        Manage / Cancel →
-                      </a>
-                    </li>
+                    <SearchResultRow
+                      key={r.id}
+                      r={r}
+                      onToggle={toggleCheckIn}
+                    />
                   ))}
                 </ul>
               )}
@@ -386,14 +402,19 @@ export default function CheckInClient({
           )}
         </div>
 
-        {/* No slots today */}
-        {slots.length === 0 && !serverError && (
+        {/* No slots for selected date */}
+        {slots.length === 0 && !serverError && !loadingDate && (
           <div className="rounded-2xl border border-linen-200 bg-linen-50 p-10 text-center">
             <Clock className="mx-auto text-gold-700" size={32} />
-            <p className="mt-3 font-medium text-royal-900">No open tour slots today</p>
+            <p className="mt-3 font-medium text-royal-900">No open tour slots {activeDate === today ? "today" : "on this day"}</p>
             <p className="mt-1 text-sm text-slate-500">
               Tours run June 21–28. Use the search bar above to look up any reservation.
             </p>
+          </div>
+        )}
+        {loadingDate && (
+          <div className="flex justify-center py-16">
+            <Loader2 className="animate-spin text-gold-700" size={28} />
           </div>
         )}
 
@@ -454,6 +475,76 @@ export default function CheckInClient({
         )}
       </div>
     </div>
+  );
+}
+
+function SearchResultRow({
+  r,
+  onToggle,
+}: {
+  r: SearchResult;
+  onToggle: (id: string, current: boolean) => Promise<void>;
+}) {
+  const [partySize, setPartySize] = useState(r.party_size);
+  const [savingParty, setSavingParty] = useState(false);
+
+  async function updatePartySize(next: number) {
+    if (next < 1 || next > 20) return;
+    setPartySize(next);
+    setSavingParty(true);
+    try {
+      await fetch("/api/checkin", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: r.id, party_size: next }),
+      });
+    } finally { setSavingParty(false); }
+  }
+
+  return (
+    <li className="px-4 py-3">
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className="truncate font-medium text-royal-900">{r.name}</p>
+          <p className="text-xs text-slate-500">
+            {r.tour_slots ? `${formatDateLong(r.tour_slots.slot_date)} at ${formatTime(r.tour_slots.start_time)}` : "—"} · {r.confirmation_code}
+          </p>
+          <div className="mt-1 flex items-center gap-2">
+            <button
+              onClick={() => updatePartySize(partySize - 1)}
+              disabled={partySize <= 1 || savingParty}
+              className="flex h-5 w-5 items-center justify-center rounded-full border border-linen-300 text-xs text-slate-500 hover:border-gold-500 hover:text-royal-900 disabled:opacity-30"
+            >−</button>
+            <span className={`flex items-center gap-1 text-xs ${savingParty ? "text-slate-400" : "text-slate-500"}`}>
+              <Users size={11} /> {partySize} {partySize === 1 ? "guest" : "guests"}
+            </span>
+            <button
+              onClick={() => updatePartySize(partySize + 1)}
+              disabled={partySize >= 20 || savingParty}
+              className="flex h-5 w-5 items-center justify-center rounded-full border border-linen-300 text-xs text-slate-500 hover:border-gold-500 hover:text-royal-900 disabled:opacity-30"
+            >+</button>
+          </div>
+        </div>
+        <button
+          onClick={() => onToggle(r.id, r.checked_in)}
+          className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+            r.checked_in
+              ? "bg-green-100 text-green-800 hover:bg-green-200"
+              : "bg-linen-200 text-slate-700 hover:bg-gold-500/20"
+          }`}
+        >
+          {r.checked_in ? "Checked in" : "Check in"}
+        </button>
+      </div>
+      <a
+        href={`/reservation/${r.confirmation_code}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-1 inline-block text-xs font-semibold text-gold-700 hover:text-gold-600 hover:underline"
+      >
+        Manage / Cancel →
+      </a>
+    </li>
   );
 }
 
