@@ -7,10 +7,10 @@ export const resend = new Resend(process.env.RESEND_API_KEY!);
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
 const SENDER = `${site.name} <${FROM}>`;
-const ADMIN_TO = ""; // admin notifications disabled
+const CONTACT_NOTIFY_TO = process.env.ADMIN_NOTIFY_EMAIL ?? "";
 // Guest replies go to a real, monitored inbox — the from-address domain is
 // send-only (no MX), so without this, replies would bounce.
-const REPLY_TO = process.env.RESEND_REPLY_TO ?? (ADMIN_TO || undefined);
+const REPLY_TO = process.env.RESEND_REPLY_TO ?? (CONTACT_NOTIFY_TO || undefined);
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL?.startsWith("http://localhost")
@@ -165,30 +165,9 @@ export async function sendReservationRescheduled(
   if (error) throw new Error(error.message);
 }
 
-// → Admin: a new reservation came in
-export async function sendAdminNewReservation(
-  data: ReservationEmailData & { phone: string | null }
-) {
-  if (!ADMIN_TO) return;
-  const when = formatDateLong(data.slotDate);
-  const time = formatTime(data.startTime);
-
-  const inner = `
-    <h1 style="font-size:20px;margin:16px 0 16px;">New tour reservation</h1>
-    <table style="width:100%;border-collapse:collapse;font-size:14px;">
-      <tr><td style="padding:8px 0;color:#888;width:90px;">Guest</td><td style="padding:8px 0;font-weight:600;">${data.name}</td></tr>
-      <tr><td style="padding:8px 0;color:#888;">Email</td><td style="padding:8px 0;"><a href="mailto:${data.to}" style="color:#9a7b3f;">${data.to}</a></td></tr>
-      ${data.phone ? `<tr><td style="padding:8px 0;color:#888;">Phone</td><td style="padding:8px 0;">${data.phone}</td></tr>` : ""}
-      <tr><td style="padding:8px 0;color:#888;">When</td><td style="padding:8px 0;">${when} · ${time}</td></tr>
-      <tr><td style="padding:8px 0;color:#888;">Party</td><td style="padding:8px 0;">${data.partySize}</td></tr>
-      <tr><td style="padding:8px 0;color:#888;">Code</td><td style="padding:8px 0;font-weight:700;">${data.code}</td></tr>
-    </table>
-    <p style="margin:20px 0 0;"><a href="${APP_URL}/admin/reservations" style="color:#9a7b3f;font-size:14px;">View all reservations →</a></p>`;
-
-  await resend.emails
-    .send({ from: SENDER, to: ADMIN_TO, replyTo: data.to, subject: `New reservation: ${data.name} (${when})`, html: shell(inner) })
-    .catch(() => {}); // non-blocking
-}
+// → Admin: a new reservation came in (notifications disabled)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function sendAdminNewReservation(_data: ReservationEmailData & { phone: string | null }) {}
 
 // → Visitor: reminder the day before
 export async function sendTourReminder(data: ReservationEmailData) {
@@ -260,7 +239,7 @@ export async function sendContactNotification(data: {
   email: string;
   message: string;
 }) {
-  if (!ADMIN_TO) return;
+  if (!CONTACT_NOTIFY_TO) return;
   const inner = `
     <h1 style="font-size:20px;margin:16px 0 16px;">New message from the website</h1>
     <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:16px;">
@@ -272,7 +251,7 @@ export async function sendContactNotification(data: {
     </div>`;
   const { error } = await resend.emails.send({
     from: SENDER,
-    to: ADMIN_TO,
+    to: CONTACT_NOTIFY_TO,
     replyTo: data.email,
     subject: `Website message from ${data.name}`,
     html: shell(inner),
