@@ -11,7 +11,10 @@ export interface CalendarEventInput {
   code: string;
 }
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.startsWith("http://localhost")
+    ? "https://castlerocktabernacle.com"
+    : (process.env.NEXT_PUBLIC_APP_URL ?? "https://castlerocktabernacle.com");
 
 // "2026-06-21" + "10:00:00" → "20260621T100000"
 function stamp(date: string, time: string): string {

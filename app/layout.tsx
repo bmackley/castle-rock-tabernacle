@@ -10,7 +10,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL?.startsWith("http://localhost")
+      ? "https://castlerocktabernacle.com"
+      : (process.env.NEXT_PUBLIC_APP_URL ?? "https://castlerocktabernacle.com")
+  ),
   title: {
     default: `${site.name} — ${site.tagline}`,
     template: `%s · ${site.name}`,

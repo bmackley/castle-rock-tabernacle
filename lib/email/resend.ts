@@ -12,7 +12,10 @@ const ADMIN_TO = process.env.ADMIN_NOTIFY_EMAIL ?? "";
 // send-only (no MX), so without this, replies would bounce.
 const REPLY_TO = process.env.RESEND_REPLY_TO ?? (ADMIN_TO || undefined);
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.startsWith("http://localhost")
+    ? "https://castlerocktabernacle.com"
+    : (process.env.NEXT_PUBLIC_APP_URL ?? "https://castlerocktabernacle.com");
 
 function shell(inner: string): string {
   return `
