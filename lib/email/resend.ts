@@ -7,7 +7,7 @@ export const resend = new Resend(process.env.RESEND_API_KEY!);
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
 const SENDER = `${site.name} <${FROM}>`;
-const ADMIN_TO = process.env.ADMIN_NOTIFY_EMAIL ?? "";
+const ADMIN_TO = ""; // admin notifications disabled
 // Guest replies go to a real, monitored inbox — the from-address domain is
 // send-only (no MX), so without this, replies would bounce.
 const REPLY_TO = process.env.RESEND_REPLY_TO ?? (ADMIN_TO || undefined);
