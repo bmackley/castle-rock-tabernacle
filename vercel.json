@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/reminders/morning",
-      "schedule": "0 13 * * *"
+      "schedule": "0 14 * * *"
     },
     {
       "path": "/api/cron/keepalive",
