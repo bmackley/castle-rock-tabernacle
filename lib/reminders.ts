@@ -36,25 +36,27 @@ export async function sendRemindersFor(window: ReminderWindow) {
 
   const send = window === "day_before" ? sendTourReminder : sendTourMorningReminder;
   const rows = (data ?? []) as unknown as Row[];
-  let sent = 0;
-  for (const r of rows) {
-    if (!r.tour_slots) continue;
-    try {
-      await send({
-        to: r.email,
-        name: r.name,
-        code: r.confirmation_code,
-        slotDate: r.tour_slots.slot_date,
-        startTime: r.tour_slots.start_time,
-        endTime: r.tour_slots.end_time,
-        partySize: r.party_size,
-      });
-      sent++;
-    } catch (err) {
-      // One bad address must not block the rest of the day's reminders.
-      console.error(`reminder (${window}) to ${r.email}`, err);
-    }
-  }
+
+  const results = await Promise.allSettled(
+    rows
+      .filter((r) => r.tour_slots)
+      .map((r) =>
+        send({
+          to: r.email,
+          name: r.name,
+          code: r.confirmation_code,
+          slotDate: r.tour_slots!.slot_date,
+          startTime: r.tour_slots!.start_time,
+          endTime: r.tour_slots!.end_time,
+          partySize: r.party_size,
+        })
+      )
+  );
+
+  const sent = results.filter((r) => r.status === "fulfilled").length;
+  results
+    .filter((r) => r.status === "rejected")
+    .forEach((r, i) => console.error(`reminder (${window}) #${i} failed`, (r as PromiseRejectedResult).reason));
 
   return { window, date: target, reminders_sent: sent };
 }
